@@ -1,0 +1,132 @@
+/* Admin extends the Signet/DOOMPS tokens from /styles.css */
+.admin-bar {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 20px; margin-bottom: 40px; flex-wrap: wrap;
+}
+.admin-who {
+  display: flex; align-items: center; gap: 14px;
+  font-family: "Space Mono", monospace; font-size: 12px; color: var(--bone-dim);
+}
+
+.form-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+.fg-field { display: flex; flex-direction: column; }
+.fg-field.fg-narrow { max-width: 140px; }
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .fg-field.fg-narrow { max-width: none; } }
+
+select {
+  background: rgba(0,0,0,0.35); border: 1px solid var(--line);
+  color: var(--bone); font-family: "Space Mono", monospace;
+  font-size: 14px; padding: 13px 14px; border-radius: 3px; appearance: none;
+}
+select:focus, input[type="number"]:focus {
+  outline: none; border-color: var(--acid); box-shadow: 0 0 0 3px rgba(200,162,74,0.14);
+}
+input[type="number"] {
+  background: rgba(0,0,0,0.35); border: 1px solid var(--line);
+  color: var(--bone); font-family: "Space Mono", monospace;
+  font-size: 15px; padding: 13px 14px; border-radius: 3px; width: 100%;
+}
+
+/* Rules table */
+.rule-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 14px; align-items: center;
+  padding: 14px 0; border-top: 1px solid var(--line);
+}
+.rule-row:first-child { border-top: none; }
+.rule-coll { min-width: 0; }
+.rule-coll .name { font-family: "Fraunces", Georgia, serif; font-weight: 700; color: var(--acid); }
+.rule-coll .addr {
+  font-family: "Space Mono", monospace; font-size: 11px; color: var(--bone-dim);
+  word-break: break-all;
+}
+.rule-thresh {
+  font-family: "Space Mono", monospace; font-size: 12px; color: var(--acid);
+  white-space: nowrap;
+}
+.rule-role {
+  font-family: "Inter", sans-serif; font-size: 13px; padding: 4px 12px;
+  border: 1px solid var(--toxic); border-radius: 999px; color: var(--bone);
+  white-space: nowrap;
+}
+.btn-del {
+  background: transparent; border: 1px solid var(--line); color: var(--bad);
+  border-radius: 3px; padding: 7px 12px; cursor: pointer; font-size: 12px;
+  font-family: "Space Mono", monospace;
+}
+.btn-del:hover { border-color: var(--bad); background: rgba(207,107,95,0.08); }
+@media (max-width: 560px) {
+  .rule-row { grid-template-columns: 1fr auto; row-gap: 8px; }
+  .rule-thresh, .rule-role { grid-column: 1; }
+}
+
+/* --- DOOMPS swamp overrides for admin --- */
+select {
+  background: rgba(0,0,0,0.45); border: 1px solid var(--line);
+  color: var(--bone); border-radius: 8px;
+}
+input[type="number"] {
+  background: rgba(0,0,0,0.45); border: 1px solid var(--line);
+  color: var(--bone); border-radius: 8px;
+}
+select:focus, input[type="number"]:focus {
+  border-color: var(--slime);
+  box-shadow: 0 0 0 3px rgba(182,255,46,0.18), 0 0 20px rgba(182,255,46,0.15);
+}
+.rule-role {
+  border: 1px solid var(--slime-deep); color: var(--slime);
+  box-shadow: 0 0 12px rgba(182,255,46,0.12);
+}
+.rule-thresh { color: var(--slime); text-shadow: 0 0 10px var(--toxic-glow); }
+.rule-coll .name { color: var(--bone); }
+.btn-del { border-color: var(--line); color: var(--bad); }
+.btn-del:hover { border-color: var(--bad); background: rgba(230,96,63,0.1); }
+
+/* keep single-line inputs from stretching in grid/flex contexts */
+.form-grid input[type="text"], .form-grid input[type="number"], .form-grid select { height: 52px; }
+
+/* --- Prize editor grid --- */
+.prize-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .prize-grid { grid-template-columns: 1fr; } }
+.prize-grid input[type="text"] { height: 48px; }
+
+/* --- Meme moderation grid --- */
+.mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.mod-cell { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+.mod-cell img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.mod-cap { padding: 8px 10px; font-size: 12px; color: var(--bone); }
+.mod-foot { margin-top: auto; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mod-user { font-family: "Space Mono", monospace; font-size: 11px; color: var(--slime); }
+#btnModMore { display: block; margin: 18px auto 0; }
+
+/* --- Winners / payouts --- */
+.pay-filter { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--bone-dim); margin-bottom: 16px; cursor: pointer; }
+.win-row {
+  display: grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center;
+  padding: 12px 0; border-top: 1px solid var(--line);
+}
+.win-row:first-of-type { border-top: none; }
+.win-who { display: flex; flex-direction: column; }
+.win-user { font-family: "Space Mono", monospace; color: var(--slime); font-size: 13px; }
+.win-day { font-size: 11px; color: var(--bone-dim); }
+.win-prize { font-family: "Fraunces", serif; font-weight: 600; color: var(--bone); }
+.win-addr { font-family: "Space Mono", monospace; font-size: 11px; color: var(--bone-dim); word-break: break-all; max-width: 240px; }
+.win-noaddr, .win-wait { font-size: 12px; color: var(--bad); font-style: italic; }
+.win-paid { font-family: "Space Mono", monospace; font-size: 12px; color: var(--slime); letter-spacing: 0.1em; }
+.btn-paid { padding: 8px 14px; font-size: 12px; }
+@media (max-width: 620px) { .win-row { grid-template-columns: 1fr auto; } .win-addr { grid-column: 1 / -1; } }
+
+/* --- Channel admin rows --- */
+.chan-admin-row {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center;
+  padding: 12px 0; border-top: 1px solid var(--line);
+}
+.chan-admin-row:first-of-type { border-top: none; }
+.ca-name strong { color: var(--slime); }
+.ca-cat { font-family: "Space Mono", monospace; font-size: 10px; color: var(--bone-dim); letter-spacing: 0.12em; }
+.ca-perm { font-size: 12px; color: var(--bone-dim); font-family: "Space Mono", monospace; }
+@media (max-width: 620px) { .chan-admin-row { grid-template-columns: 1fr auto; } .ca-perm { grid-column: 1 / -1; } }

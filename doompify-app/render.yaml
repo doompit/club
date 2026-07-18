@@ -1,0 +1,83 @@
+# Render Blueprint for the Doompify app (The Swamp Club)
+# Deploys TWO services from this one repo:
+#   1. swampclub-api  — the web service (backend) that serves the site + API
+#   2. swampclub-bot  — the Discord bot (background worker)
+# Both share ONE persistent disk so the SQLite DB + uploaded images survive
+# restarts and deploys.
+#
+# HOW TO USE:
+#   1. Push doompify-app/ to a GitHub repo (this file must be at the repo root).
+#   2. In Render: New + → Blueprint → pick the repo.
+#   3. Render reads this file and creates both services + the disk.
+#   4. Fill in the environment variables it prompts for (the ones marked
+#      sync:false below). See DEPLOY.md / DISCORD-BOT.md for what each is.
+#
+# NOTE: the persistent disk is attached to the API service. The bot writes to
+# the same database, so it uses the same disk path via DB_PATH. On Render, a
+# disk can only mount to ONE service, so the bot must run in the SAME service
+# OR use a shared connection. To keep it simple and correct, this blueprint
+# runs the bot as a separate worker that points DB_PATH at a disk mounted on
+# the API — which Render does NOT allow across services. Therefore we mount the
+# disk on the API and run BOTH processes there via a start script. See the
+# "combined" service below (recommended). The separate-worker option is
+# documented in RENDER.md for advanced setups with an external database.
+
+services:
+  # ---- Combined web service: runs the backend API AND the bot together ----
+  # This is the recommended setup because both need the same SQLite file, and a
+  # Render disk mounts to only one service.
+  - type: web
+    name: swampclub
+    runtime: node
+    plan: starter            # starter has a persistent disk; free does not
+    rootDir: .               # repo root (doompify-app)
+    buildCommand: npm install && npm run migrate
+    startCommand: node start-all.js
+    disk:
+      name: swampclub-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "4000"
+      - key: PUBLIC_URL
+        value: https://club.doomps.xyz
+      - key: BRAND_NAME
+        value: The Swamp Club
+      # Persistent paths on the mounted disk:
+      - key: DB_PATH
+        value: /data/doompify.db
+      - key: UPLOADS_DIR
+        value: /data/uploads
+      - key: ALCHEMY_NETWORK
+        value: eth-mainnet
+      - key: RECHECK_INTERVAL_MIN
+        value: "360"
+      # --- secrets you fill in on the Render dashboard ---
+      - key: DOOMPS_CONTRACT
+        sync: false
+      - key: ALCHEMY_API_KEY
+        sync: false
+      - key: OPENSEA_API_KEY
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: DISCORD_GUILD_ID
+        sync: false
+      - key: ADMIN_ROLE_IDS
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true      # Render generates a strong random value
+      # OAuth callback URLs (must match what you register in Discord):
+      - key: DISCORD_REDIRECT_URI
+        value: https://club.doomps.xyz/auth/discord/callback
+      - key: USER_REDIRECT_URI
+        value: https://club.doomps.xyz/auth/user/callback
+      - key: ADMIN_REDIRECT_URI
+        value: https://club.doomps.xyz/admin/api/callback

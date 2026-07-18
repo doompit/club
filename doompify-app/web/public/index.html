@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doompify — Enter the Swamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/swamp.css" />
+</head>
+<body>
+<div class="grain"></div>
+<nav class="topnav">
+  <a class="brand" href="/">DOOMPS</a>
+  <div class="navlinks">
+    <a href="https://doomps.xyz">Home</a>
+    <a href="/" class="active">Verify</a>
+    <a href="/swamp.html#gallery">Gallery</a>
+    <a href="/swamp.html#memematic">Memematic 3000</a>
+    <a href="/chat.html">The Swamp</a>
+    <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
+  </div>
+</nav>
+<main class="stage">
+  <header class="masthead">
+    <div class="sigil" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="72" height="72">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="37" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="2 4"/>
+        <!-- swamp monster: hooded head, horns, glowing eyes, slimy jaw -->
+        <path d="M36 36 C36 24 45 19 50 19 C55 19 64 24 64 36 C59 32 55 31 50 31 C45 31 41 32 36 36 Z" fill="currentColor" opacity="0.8"/>
+        <path d="M33 41 L27 31 L37 37 Z M67 41 L73 31 L63 37 Z" fill="currentColor"/>
+        <ellipse cx="43" cy="46" rx="5" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="57" cy="46" rx="5" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="43" cy="46" r="2" fill="currentColor"/><circle cx="57" cy="46" r="2" fill="currentColor"/>
+        <path d="M38 56 C44 66 56 66 62 56 C60 63 55 69 50 69 C45 69 40 63 38 56 Z" fill="currentColor" opacity="0.5"/>
+        <path d="M42 66 L42 72 M50 68 L50 75 M58 66 L58 72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+    </div>
+    <p class="eyebrow">Welcome to the Swamp</p>
+    <h1 class="title">Prove you're a survivor.</h1>
+    <p class="lede">
+      No wallet-connect. No signatures. No seed phrase. Carve a one-time mark into each
+      wallet's OpenSea bio and crawl out with your roles. <span>Holdings pool across every
+      wallet you link.</span>
+    </p>
+  </header>
+
+  <!-- STEP 1 -->
+  <section class="panel" id="step-address">
+    <div class="step-tab">I · Claim a wallet</div>
+    <label class="field-label" for="addr">Ethereum address</label>
+    <div class="input-row">
+      <input id="addr" type="text" spellcheck="false" autocomplete="off" placeholder="0x…" />
+      <button id="btnClaim" class="btn-primary">Draw the mark</button>
+    </div>
+    <p class="hint" id="addrHint"></p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel is-locked" id="step-inscribe">
+    <div class="step-tab">II · Carve the mark</div>
+    <p class="instr">Drop this exact mark into that wallet's OpenSea bio and save it:</p>
+    <div class="inscription">
+      <code id="challenge">—</code>
+      <button id="btnCopy" class="btn-ghost" title="Copy">Copy</button>
+    </div>
+    <ol class="walk">
+      <li>Open the wallet's OpenSea profile → <strong>Edit profile</strong>.</li>
+      <li>Paste the mark anywhere in the <strong>Bio</strong>, then <strong>Save</strong>.</li>
+      <li>Crawl back and DOOMP it below.</li>
+    </ol>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel is-locked" id="step-seal">
+    <div class="step-tab">III · Seal it</div>
+    <button id="btnConfirm" class="btn-primary btn-wide">DOOMP IT.</button>
+    <div id="verdict" class="verdict" hidden></div>
+  </section>
+
+  <!-- Ledger -->
+  <section class="panel is-locked" id="step-ledger">
+    <div class="step-tab">Survivors sealed</div>
+    <ul class="ledger" id="ledger"></ul>
+    <div class="ledger-actions">
+      <button id="btnAnother" class="btn-ghost">+ Add another wallet</button>
+      <a id="btnDiscord" class="btn-discord" hidden>Link Discord &amp; claim roles</a>
+    </div>
+  </section>
+
+  <footer class="colophon"><span>DOOMPIFY</span></footer>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

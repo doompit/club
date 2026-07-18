@@ -1,0 +1,13 @@
+{
+  "name": "@doompify/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0"
+  }
+}

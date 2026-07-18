@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Swamp — DOOMPS Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/swamp.css" />
+<link rel="stylesheet" href="/chat.css" />
+</head>
+<body>
+<div class="grain"></div>
+<nav class="topnav">
+  <a class="brand" href="/">DOOMPS</a>
+  <div class="navlinks">
+    <a href="https://doomps.xyz">Home</a>
+    <a href="/">Verify</a>
+    <a href="/swamp.html#gallery">Gallery</a>
+    <a href="/swamp.html#memematic">Memematic 3000</a>
+    <a href="/chat.html" class="active">The Swamp</a>
+    <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <div class="nav-user">
+    <a class="btn-ghost" id="btnLogin" href="/auth/user/login">Log in with Discord</a>
+    <span class="whoami" id="whoami" hidden></span>
+    <button class="btn-ghost" id="btnLogout" hidden>Log out</button>
+  </div>
+</nav>
+
+<div class="chat-shell">
+  <!-- Channel sidebar -->
+  <aside class="chat-sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="sidebar-logo">🧪 THE SWAMP</span>
+    </div>
+    <div id="channelList" class="channel-list"></div>
+    <div class="sidebar-foot" id="sidebarFoot"></div>
+  </aside>
+
+  <!-- Main chat area -->
+  <main class="chat-main">
+    <header class="chat-head">
+      <div>
+        <h2 id="chanName"># swamp</h2>
+        <p id="chanTopic" class="chan-topic"></p>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Channels">☰</button>
+    </header>
+
+    <div class="msg-scroll" id="msgScroll">
+      <div class="msg-empty" id="msgEmpty" hidden>No messages yet. Break the swamp silence.</div>
+    </div>
+
+    <div class="composer" id="composer">
+      <div class="composer-preview" id="composerPreview" hidden>
+        <img id="composerImg" alt="attachment" />
+        <button id="composerImgX" class="chip-x">✕</button>
+      </div>
+      <div class="composer-row">
+        <label class="attach-btn" title="Attach image">
+          <input type="file" id="chatFile" accept="image/png,image/jpeg,image/gif,image/webp" hidden />
+          <span>＋</span>
+        </label>
+        <input id="msgInput" type="text" maxlength="2000" placeholder="Message the swamp…" autocomplete="off" />
+        <button id="btnSend" class="btn-primary btn-send">Send</button>
+      </div>
+      <p class="composer-locked" id="composerLocked" hidden></p>
+    </div>
+  </main>
+</div>
+
+<!-- reaction picker -->
+<div class="rx-picker" id="rxPicker" hidden></div>
+
+<script src="/chat.js"></script>
+</body>
+</html>
