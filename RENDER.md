@@ -78,6 +78,8 @@ at the root.
 5. Click **Apply**. Render installs, runs the DB migration, and starts the
    service (backend + bot together).
 6. Watch the **Logs** tab. You want to see, in order:
+   - `[start-all] running database migration…`
+   - `Migrated DB at /data/doompify.db`
    - `[start-all] registering slash commands…`
    - `Registered 6 guild commands…`
    - `... bot online as <name>`
@@ -98,8 +100,10 @@ Then jump to **Step 3 (custom domain)** below.
 2. Settings:
    - **Root Directory:** leave blank (repo root).
    - **Runtime:** Node.
-   - **Build Command:** `npm install && npm run migrate`
+   - **Build Command:** `npm install`
    - **Start Command:** `node start-all.js`
+     (the migration now runs automatically at startup, when the disk is
+     mounted — you do not run it in the build step)
    - **Instance type:** Starter or higher (needed for a persistent disk).
 3. **Add a disk:** in the service's **Disks** section, add one:
    - **Name:** `swampclub-data`
@@ -201,6 +205,7 @@ Render "swampclub" web service (Starter, 1GB disk at /data)
 | Symptom | Fix |
 | ------- | --- |
 | Build fails on `better-sqlite3` | Ensure `NODE_VERSION=20` (or 18/20). It's a native module Render compiles at build; a mismatched Node can break it. |
+| `migrate failed with error code 1` in build | Old build command ran `npm run migrate` before env/disk were ready. Fixed: migration now runs at **startup** via `start-all.js`. Set Build Command to just `npm install` and Start Command to `node start-all.js`. |
 | App boots but data resets each deploy | You're on Free (no disk) or `DB_PATH`/`UPLOADS_DIR` aren't set to `/data/...`. Use Starter + the disk, and point both at `/data`. |
 | "Cannot find module @doompify/shared" | The repo must include `package.json` (workspaces) at the root and the `shared/` folder. Confirm they're pushed. |
 | Bot online but no roles assigned | Bot's role is below the target role in Discord, or `ADMIN_ROLE_IDS`/rules not set. See DISCORD-BOT.md. |

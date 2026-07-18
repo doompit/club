@@ -50,7 +50,13 @@ function run(name, cwd, args, { optional = false } = {}) {
 }
 
 async function main() {
-  // 1. Register slash commands (runs to completion, then continues).
+  // 0. Run the database migration at startup (not build time) — this is when
+  //    the persistent disk is mounted and DB_PATH is available. Safe to run
+  //    every boot; it only creates tables/columns that don't already exist.
+  console.log("[start-all] running database migration…");
+  await run("migrate", "backend", ["src/migrate.js"], { optional: false });
+
+  // 1. Register Discord slash commands (runs to completion, then continues).
   console.log("[start-all] registering slash commands…");
   await run("register", "bot", ["src/register-commands.js"], { optional: true });
 
