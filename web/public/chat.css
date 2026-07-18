@@ -1,0 +1,113 @@
+/* The Swamp chat — Discord-style, DOOMPS swamp palette (builds on /styles.css) */
+
+.chat-shell {
+  display: grid; grid-template-columns: 250px 1fr;
+  height: calc(100vh - 61px); /* minus topnav */
+  position: relative; z-index: 1;
+}
+@media (max-width: 720px) { .chat-shell { grid-template-columns: 1fr; } }
+
+/* ---- Sidebar ---- */
+.chat-sidebar {
+  background: rgba(6, 10, 4, 0.85); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.sidebar-head { padding: 16px 16px 10px; border-bottom: 1px solid var(--line); }
+.sidebar-logo {
+  font-family: "Fraunces", "Arial Black", sans-serif; font-weight: 900; color: var(--slime);
+  font-size: 15px; letter-spacing: 0.06em; text-shadow: 0 0 14px var(--toxic-glow);
+}
+.channel-list { flex: 1; padding: 10px 8px; }
+.cat-label {
+  font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.18em;
+  color: var(--bone-dim); text-transform: uppercase; padding: 14px 8px 6px;
+}
+.chan-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px;
+  color: var(--bone-dim); cursor: pointer; font-size: 14px; user-select: none;
+}
+.chan-item:hover { background: rgba(182,255,46,0.06); color: var(--bone); }
+.chan-item.active { background: rgba(182,255,46,0.12); color: var(--slime); }
+.chan-item .hash { color: var(--slime-deep); font-weight: 700; }
+.chan-item.locked { opacity: 0.55; }
+.chan-lock { margin-left: auto; font-size: 11px; opacity: 0.7; }
+
+.sidebar-foot { padding: 12px 16px; border-top: 1px solid var(--line); font-family: "Space Mono", monospace; font-size: 11px; color: var(--bone-dim); }
+
+/* ---- Main ---- */
+.chat-main { display: flex; flex-direction: column; min-width: 0; }
+.chat-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--line); background: rgba(8,12,6,0.5);
+}
+.chat-head h2 { font-family: "Fraunces", serif; font-weight: 700; font-size: 18px; color: var(--bone); }
+.chan-topic { font-size: 12px; color: var(--bone-dim); margin-top: 2px; }
+.hamburger { display: none; background: none; border: none; color: var(--slime); font-size: 22px; cursor: pointer; }
+@media (max-width: 720px) {
+  .hamburger { display: block; }
+  .chat-sidebar { position: absolute; inset: 0 auto 0 0; width: 250px; z-index: 20; transform: translateX(-100%); transition: transform 0.2s; }
+  .chat-sidebar.open { transform: translateX(0); }
+}
+
+.msg-scroll { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 2px; }
+.msg-empty { color: var(--bone-dim); font-style: italic; text-align: center; margin: auto; }
+
+/* message row */
+.msg {
+  display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 6px 8px; border-radius: 8px;
+  position: relative;
+}
+.msg:hover { background: rgba(255,255,255,0.02); }
+.msg-av {
+  width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--slime-deep), #1a2410);
+  display: grid; place-items: center; color: var(--slime); font-family: "Fraunces", serif; font-weight: 900; font-size: 16px;
+}
+.msg-body { min-width: 0; }
+.msg-head { display: flex; align-items: baseline; gap: 8px; }
+.msg-user { font-weight: 700; color: var(--slime); font-size: 14px; }
+.msg-time { font-size: 11px; color: var(--bone-dim); }
+.msg-text { color: var(--bone); font-size: 14.5px; line-height: 1.45; word-wrap: break-word; overflow-wrap: anywhere; }
+.msg-img { margin-top: 6px; max-width: 340px; max-height: 300px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.msg-del { position: absolute; top: 6px; right: 8px; background: none; border: none; color: var(--bad); cursor: pointer; font-size: 12px; opacity: 0; }
+.msg:hover .msg-del { opacity: 0.7; }
+
+/* reactions */
+.msg-rx { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.rx-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--line); background: rgba(0,0,0,0.3); font-size: 13px; cursor: pointer; color: var(--bone);
+}
+.rx-chip.mine { border-color: var(--slime); background: rgba(182,255,46,0.12); color: var(--slime); }
+.rx-add { color: var(--bone-dim); cursor: pointer; font-size: 14px; padding: 2px 7px; border-radius: 999px; opacity: 0; }
+.msg:hover .rx-add { opacity: 0.8; }
+.rx-add:hover { background: rgba(182,255,46,0.1); color: var(--slime); }
+
+/* reaction picker popover */
+.rx-picker {
+  position: absolute; z-index: 40; background: var(--swamp-2); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px; display: flex; gap: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+.rx-picker button { background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px; border-radius: 6px; }
+.rx-picker button:hover { background: rgba(182,255,46,0.12); }
+
+/* composer */
+.composer { border-top: 1px solid var(--line); padding: 14px 20px; background: rgba(8,12,6,0.5); }
+.composer-row { display: flex; gap: 10px; align-items: center; }
+.attach-btn {
+  width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--line);
+  display: grid; place-items: center; cursor: pointer; color: var(--slime); font-size: 22px; flex-shrink: 0;
+}
+.attach-btn:hover { background: rgba(182,255,46,0.08); border-color: var(--slime); }
+#msgInput {
+  flex: 1; height: 44px; background: rgba(0,0,0,0.45); border: 1px solid var(--line); color: var(--bone);
+  font-family: "Inter", sans-serif; font-size: 15px; padding: 0 16px; border-radius: 8px; min-width: 0;
+}
+#msgInput:focus { outline: none; border-color: var(--slime); box-shadow: 0 0 0 3px rgba(182,255,46,0.15); }
+.btn-send { padding: 12px 22px; }
+.composer-locked { color: var(--bad); font-size: 13px; margin-top: 8px; }
+.composer-preview { position: relative; display: inline-block; margin-bottom: 10px; }
+.composer-preview img { max-height: 120px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.chip-x {
+  position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--bad); color: #fff; border: none; cursor: pointer; font-size: 12px;
+}

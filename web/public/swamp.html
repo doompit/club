@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DOOMPS — The Swamp: Memes &amp; Memematic 3000</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/swamp.css" />
+</head>
+<body>
+<div class="grain"></div>
+<nav class="topnav">
+  <a class="brand" href="/">DOOMPS</a>
+  <div class="navlinks">
+    <a href="https://doomps.xyz">Home</a>
+    <a href="/">Verify</a>
+    <a href="/swamp.html#gallery" class="active">Gallery</a>
+    <a href="/swamp.html#memematic" class="active">Memematic 3000</a>
+    <a href="/chat.html">The Swamp</a>
+    <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <div class="nav-user" id="navUser">
+    <a class="btn-ghost" id="btnLogin" href="/auth/user/login">Log in with Discord</a>
+    <span class="whoami" id="whoami" hidden></span>
+    <button class="btn-ghost" id="btnLogout" hidden>Log out</button>
+  </div>
+</nav>
+
+<main class="stage wide">
+
+  <!-- ================= MEMEMATIC 3000 ================= -->
+  <section id="memematic">
+    <header class="sec-head">
+      <p class="eyebrow">One spin per survivor per day</p>
+      <h1 class="title glitch">The Memematic 3000</h1>
+      <p class="lede">
+        Upload a meme, then pull the lever. Half the wheel pays out — the other half
+        <span class="rugword">rugs you</span>. Holders only. Resets at 00:00 UTC.
+      </p>
+    </header>
+
+    <div class="machine">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <canvas id="wheel" width="520" height="520" aria-label="Memematic 3000 wheel"></canvas>
+        <div class="wheel-hub" id="wheelHub">
+          <span>DOOMP</span>
+        </div>
+      </div>
+
+      <div class="machine-side">
+        <div class="odds-card">
+          <div class="odds-title">Daily odds</div>
+          <ul class="odds-list" id="oddsList">
+            <li><span class="dot big"></span><span class="ol-name" data-tier="big">Big</span><span class="ol-pct">5%</span></li>
+            <li><span class="dot medium"></span><span class="ol-name" data-tier="medium">Medium</span><span class="ol-pct">10%</span></li>
+            <li><span class="dot small"></span><span class="ol-name" data-tier="small">Small</span><span class="ol-pct">15%</span></li>
+            <li><span class="dot tiny"></span><span class="ol-name" data-tier="tiny">Tiny</span><span class="ol-pct">20%</span></li>
+            <li><span class="dot rug"></span><span class="ol-name">Rugged</span><span class="ol-pct">50%</span></li>
+          </ul>
+        </div>
+        <button id="btnSpin" class="btn-primary btn-lever">PULL THE LEVER</button>
+        <p class="spin-status" id="spinStatus"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UPLOAD ================= -->
+  <section id="upload" class="panel upload-panel">
+    <div class="step-tab">Feed the swamp</div>
+    <p class="instr">Holders can drop memes into the gallery. Every upload keeps your daily spin unlocked.</p>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/gif,image/webp" hidden />
+      <div class="dz-inner" id="dzInner">
+        <div class="dz-icon">▽</div>
+        <p><strong>Drop a meme</strong> or tap to choose</p>
+        <p class="dz-sub">PNG · JPG · GIF · WEBP — up to 8&nbsp;MB</p>
+      </div>
+      <img id="dzPreview" class="dz-preview" hidden alt="preview" />
+    </div>
+    <input id="caption" type="text" maxlength="280" placeholder="Caption (optional)" class="caption-input" />
+    <button id="btnUpload" class="btn-primary btn-wide" disabled>UPLOAD TO THE SWAMP</button>
+    <p class="hint" id="uploadHint"></p>
+  </section>
+
+  <!-- ================= GALLERY ================= -->
+  <section id="gallery">
+    <header class="sec-head left">
+      <p class="eyebrow">The Swamp Gallery</p>
+      <h2 class="title2">Fresh out of the muck</h2>
+    </header>
+    <div class="masonry" id="galleryGrid"></div>
+    <div class="gallery-empty" id="galleryEmpty" hidden>No memes yet. Be the first to feed the swamp.</div>
+    <button id="btnMore" class="btn-ghost" hidden>Load more</button>
+  </section>
+
+  <footer class="colophon"><span>DOOMPIFY</span></footer>
+</main>
+
+<!-- ============ RESULT OVERLAY (win + rug) ============ -->
+<div class="overlay" id="overlay" hidden>
+  <!-- Reusable swamp-monster mark -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="swampmon" viewBox="0 0 100 100">
+      <!-- hunched hooded body -->
+      <path d="M50 20 C32 20 24 34 24 50 C24 66 30 82 50 82 C70 82 76 66 76 50 C76 34 68 20 50 20 Z"
+            fill="currentColor" opacity="0.16"/>
+      <!-- head ridge / horns -->
+      <path d="M34 34 C34 22 44 16 50 16 C56 16 66 22 66 34 C60 30 56 29 50 29 C44 29 40 30 34 34 Z"
+            fill="currentColor" opacity="0.8"/>
+      <path d="M30 40 L24 30 L34 36 Z M70 40 L76 30 L66 36 Z" fill="currentColor"/>
+      <!-- slimy jaw -->
+      <path d="M34 52 C40 64 60 64 66 52 C64 60 58 68 50 68 C42 68 36 60 34 52 Z"
+            fill="currentColor" opacity="0.55"/>
+      <!-- big glowing eyes -->
+      <ellipse cx="42" cy="46" rx="6" ry="7" fill="#0c1207"/>
+      <ellipse cx="58" cy="46" rx="6" ry="7" fill="#0c1207"/>
+      <circle cx="42" cy="45" r="2.6" fill="#b6ff2e"/>
+      <circle cx="58" cy="45" r="2.6" fill="#b6ff2e"/>
+      <!-- drips -->
+      <path d="M40 66 L40 74 M50 68 L50 78 M60 66 L60 73" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    </symbol>
+  </svg>
+  <div class="overlay-inner">
+    <div id="ovWin" hidden>
+      <div class="ov-emoji"><svg class="mon win-mon"><use href="#swampmon"/></svg></div>
+      <h2 class="ov-title win" id="ovWinTitle">WAGMI</h2>
+      <p class="ov-sub" id="ovWinSub">You won</p>
+      <div class="ov-prize" id="ovPrize"></div>
+      <div class="claim" id="claimBox">
+        <p class="claim-label">Drop the wallet to send your prize to:</p>
+        <div class="claim-row">
+          <input id="claimAddr" type="text" spellcheck="false" placeholder="0x…" />
+          <button id="btnClaim" class="btn-primary">Claim</button>
+        </div>
+        <p class="hint" id="claimHint"></p>
+      </div>
+      <div class="claim-done" id="claimDone" hidden>Prize claim locked in. The swamp keepers will send it to your wallet.</div>
+    </div>
+    <div id="ovRug" hidden>
+      <div class="rug-scene">
+        <div class="rug-carpet" id="rugCarpet"></div>
+        <div class="rug-monster" id="rugMonster"><svg class="mon"><use href="#swampmon"/></svg></div>
+      </div>
+      <h2 class="ov-title rug">RUGGED.</h2>
+      <p class="ov-sub" id="ovRugSub">The swamp took everything. Try again tomorrow.</p>
+    </div>
+    <button class="btn-ghost ov-close" id="ovClose">Close</button>
+  </div>
+</div>
+
+<script src="/swamp.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doompify — Swamp Keeper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- Gate -->
+<main class="stage" id="gate">
+  <header class="masthead">
+    <div class="sigil" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="60" height="60">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M50 26 L50 54 M50 62 L50 64" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="2 3"/>
+      </svg>
+    </div>
+    <p class="eyebrow">Swamp Keeper</p>
+    <h1 class="title">Rules of the Swamp.</h1>
+    <p class="lede">Sign in with Discord. Only keepers holding an admin role in the server may set the rules.</p>
+    <a href="/admin/api/login" class="btn-discord" style="max-width:320px;margin:28px auto 0;">Sign in with Discord</a>
+  </header>
+</main>
+
+<!-- Console -->
+<main class="stage" id="console" hidden>
+  <header class="admin-bar">
+    <div>
+      <p class="eyebrow">Swamp Keeper</p>
+      <h1 class="title" style="font-size:clamp(26px,5vw,40px);">Role rules</h1>
+    </div>
+    <div class="admin-who">
+      <span id="whoami"></span>
+      <button id="btnLogout" class="btn-ghost">Sign out</button>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="step-tab">New rule</div>
+    <p class="instr">Grant a role when a survivor's <strong>pooled</strong> holdings across all their linked wallets reach a threshold for a collection.</p>
+    <div class="form-grid">
+      <div class="fg-field">
+        <label class="field-label" for="collection">Collection contract</label>
+        <input id="collection" type="text" spellcheck="false" placeholder="0x…" />
+      </div>
+      <div class="fg-field">
+        <label class="field-label" for="collectionName">Label (optional)</label>
+        <input id="collectionName" type="text" placeholder="e.g. Doomps" />
+      </div>
+      <div class="fg-field fg-narrow">
+        <label class="field-label" for="minCount">Min held</label>
+        <input id="minCount" type="number" min="1" value="1" />
+      </div>
+      <div class="fg-field">
+        <label class="field-label" for="roleId">Role</label>
+        <select id="roleId"><option value="">Loading roles…</option></select>
+      </div>
+    </div>
+    <button id="btnAddRule" class="btn-primary" style="margin-top:18px;">Seal rule</button>
+    <p class="hint" id="ruleHint"></p>
+  </section>
+
+  <section class="panel">
+    <div class="step-tab">Active rules</div>
+    <div id="rulesWrap"><p class="instr" id="rulesEmpty">No rules yet.</p></div>
+  </section>
+
+  <!-- Memematic 3000 prize editor -->
+  <section class="panel">
+    <div class="step-tab">Memematic 3000 · Prizes</div>
+    <p class="instr">Rename the four winning tiers. Odds are fixed (5/10/15/20, with a 50% rug) and can't be changed here.</p>
+    <div class="prize-grid">
+      <div class="fg-field"><label class="field-label">Big (5%)</label><input id="prizeBig" type="text" maxlength="60" /></div>
+      <div class="fg-field"><label class="field-label">Medium (10%)</label><input id="prizeMedium" type="text" maxlength="60" /></div>
+      <div class="fg-field"><label class="field-label">Small (15%)</label><input id="prizeSmall" type="text" maxlength="60" /></div>
+      <div class="fg-field"><label class="field-label">Tiny (20%)</label><input id="prizeTiny" type="text" maxlength="60" /></div>
+    </div>
+    <button id="btnSavePrizes" class="btn-primary" style="margin-top:18px;">Save prizes</button>
+    <p class="hint" id="prizeHint"></p>
+  </section>
+
+  <!-- Meme moderation -->
+  <section class="panel">
+    <div class="step-tab">Swamp Gallery · Moderation</div>
+    <p class="instr">Memes auto-publish. Remove anything that shouldn't be in the swamp.</p>
+    <div id="modGrid" class="mod-grid"></div>
+    <p class="instr" id="modEmpty" hidden>No memes uploaded yet.</p>
+    <button id="btnModMore" class="btn-ghost" hidden>Load more</button>
+  </section>
+
+  <!-- Memematic winners / payouts -->
+  <section class="panel">
+    <div class="step-tab">Memematic 3000 · Payouts</div>
+    <p class="instr">Winners who submitted a wallet. Mark each paid once you've sent the prize.</p>
+    <label class="pay-filter"><input type="checkbox" id="onlyPending" checked /> Show only unpaid</label>
+    <div id="winsWrap"><p class="instr" id="winsEmpty">No winners yet.</p></div>
+  </section>
+
+  <!-- The Swamp: channels -->
+  <section class="panel">
+    <div class="step-tab">The Swamp · Channels</div>
+    <p class="instr">Create channels and set who can read and post. Post permission always requires holding DOOMPS (admins excepted).</p>
+    <div class="form-grid">
+      <div class="fg-field"><label class="field-label" for="chanCategory">Category</label><input id="chanCategory" type="text" placeholder="e.g. SWAMP" /></div>
+      <div class="fg-field"><label class="field-label" for="chanNameNew">Channel name</label><input id="chanNameNew" type="text" placeholder="e.g. alpha-chat" /></div>
+      <div class="fg-field" style="grid-column:1/-1;"><label class="field-label" for="chanTopicNew">Topic (optional)</label><input id="chanTopicNew" type="text" placeholder="What's this channel about?" /></div>
+      <div class="fg-field"><label class="field-label" for="chanRead">Who can read</label><select id="chanRead"></select></div>
+      <div class="fg-field"><label class="field-label" for="chanPost">Who can post</label><select id="chanPost"></select></div>
+    </div>
+    <button id="btnAddChannel" class="btn-primary" style="margin-top:18px;">Create channel</button>
+    <p class="hint" id="chanHint"></p>
+    <div id="chansWrap" style="margin-top:20px;"></div>
+  </section>
+
+  <footer class="colophon"><span>DOOMPIFY</span></footer>
+</main>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>
