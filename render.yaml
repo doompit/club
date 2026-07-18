@@ -31,7 +31,7 @@ services:
     runtime: node
     plan: starter            # starter has a persistent disk; free does not
     rootDir: .               # repo root (doompify-app)
-    buildCommand: npm install && npm run migrate
+    buildCommand: npm install
     startCommand: node start-all.js
     disk:
       name: swampclub-data
