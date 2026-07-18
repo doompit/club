@@ -10,6 +10,9 @@ function req(name) {
 export const config = {
   dbPath: process.env.DB_PATH || "../data/doompify.db",
   brandName: process.env.BRAND_NAME || "Doompify",
+  clubUrl: process.env.CLUB_URL || "https://club.doomps.xyz",
+  discordInvite: process.env.DISCORD_INVITE || "https://discord.gg/fm3A7Wn8Fh",
+  openseaUrl: process.env.OPENSEA_URL || "https://opensea.io/collection/doomps/",
 
   alchemyKey: req("ALCHEMY_API_KEY"),
   alchemyNetwork: process.env.ALCHEMY_NETWORK || "eth-mainnet",

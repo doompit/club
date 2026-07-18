@@ -1,4 +1,4 @@
-import { REST, Routes, SlashCommandBuilder } from "discord.js";
+import { REST, Routes, SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { config } from "./config.js";
 
 const commands = [
@@ -22,6 +22,10 @@ const commands = [
   new SlashCommandBuilder()
     .setName("status")
     .setDescription("Show your verification status"),
+  new SlashCommandBuilder()
+    .setName("setup")
+    .setDescription("Post the DOOMPS verification panel in this channel (admins only)")
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 ].map((c) => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(config.botToken);

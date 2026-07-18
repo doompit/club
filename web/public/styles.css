@@ -49,6 +49,13 @@ body::before {
 .sigil { color: var(--slime); display: inline-flex; margin-bottom: 22px;
   filter: drop-shadow(0 0 22px var(--toxic-glow)); }
 .sigil svg { animation: spin 50s linear infinite; }
+.mascot-mark {
+  width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--slime);
+  box-shadow: 0 0 30px var(--toxic-glow), inset 0 0 20px rgba(0,0,0,0.5);
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .eyebrow {

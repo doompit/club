@@ -134,7 +134,7 @@ export function chatRouter(db) {
     if (!canRead(channel, ctx)) return res.status(403).json({ error: "No access." });
 
     const emoji = String(req.body.emoji || "").slice(0, 8);
-    const allowed = ["🐸", "🔥", "💀", "🚀", "😂", "👀", "🤮", "🧪"];
+    const allowed = ["👹", "🔥", "💀", "🚀", "😂", "👀", "🤮", "🧪"];
     if (!allowed.includes(emoji)) return res.status(400).json({ error: "Emoji not allowed." });
 
     const r = toggleReaction(db, { messageId: msg.id, discordId: ctx.user.id, emoji, now: Date.now() });

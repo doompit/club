@@ -1,15 +1,20 @@
 {
-  "name": "@doompify/bot",
+  "name": "doompify-app",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
+  "workspaces": [
+    "shared",
+    "backend",
+    "bot"
+  ],
   "scripts": {
-    "start": "node src/index.js",
-    "register": "node src/register-commands.js"
+    "start:backend": "npm start --workspace backend",
+    "migrate": "npm run migrate --workspace backend",
+    "start:bot": "npm start --workspace bot",
+    "register": "npm run register --workspace bot"
   },
-  "dependencies": {
-    "@doompify/shared": "file:../shared",
-    "better-sqlite3": "^11.3.0",
-    "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5"
+  "engines": {
+    "node": ">=18"
   }
 }

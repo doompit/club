@@ -1,5 +1,5 @@
 const $ = (id) => document.getElementById(id);
-const EMOJIS = ["🐸", "🔥", "💀", "🚀", "😂", "👀", "🤮", "🧪"];
+const EMOJIS = ["👹", "🔥", "💀", "🚀", "😂", "👀", "🤮", "🧪"];
 
 const state = {
   me: { loggedIn: false, isAdmin: false, isHolder: false },

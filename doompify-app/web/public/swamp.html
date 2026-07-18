@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>DOOMPS — The Swamp: Memes &amp; Memematic 3000</title>
+<link rel="icon" type="image/jpeg" href="/img/doomps-logo.jpeg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,7 +14,7 @@
 <body>
 <div class="grain"></div>
 <nav class="topnav">
-  <a class="brand" href="/">DOOMPS</a>
+  <a class="brand" href="/"><img src="/img/doomps-logo.jpeg" class="brand-logo" alt="DOOMPS" />DOOMPS</a>
   <div class="navlinks">
     <a href="https://doomps.xyz">Home</a>
     <a href="/">Verify</a>
@@ -47,7 +48,7 @@
         <div class="wheel-pointer"></div>
         <canvas id="wheel" width="520" height="520" aria-label="Memematic 3000 wheel"></canvas>
         <div class="wheel-hub" id="wheelHub">
-          <span>DOOMP</span>
+          <img src="/img/doomps-logo.jpeg" class="hub-img" alt="DOOMPS" />
         </div>
       </div>
 
@@ -102,31 +103,9 @@
 
 <!-- ============ RESULT OVERLAY (win + rug) ============ -->
 <div class="overlay" id="overlay" hidden>
-  <!-- Reusable swamp-monster mark -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="swampmon" viewBox="0 0 100 100">
-      <!-- hunched hooded body -->
-      <path d="M50 20 C32 20 24 34 24 50 C24 66 30 82 50 82 C70 82 76 66 76 50 C76 34 68 20 50 20 Z"
-            fill="currentColor" opacity="0.16"/>
-      <!-- head ridge / horns -->
-      <path d="M34 34 C34 22 44 16 50 16 C56 16 66 22 66 34 C60 30 56 29 50 29 C44 29 40 30 34 34 Z"
-            fill="currentColor" opacity="0.8"/>
-      <path d="M30 40 L24 30 L34 36 Z M70 40 L76 30 L66 36 Z" fill="currentColor"/>
-      <!-- slimy jaw -->
-      <path d="M34 52 C40 64 60 64 66 52 C64 60 58 68 50 68 C42 68 36 60 34 52 Z"
-            fill="currentColor" opacity="0.55"/>
-      <!-- big glowing eyes -->
-      <ellipse cx="42" cy="46" rx="6" ry="7" fill="#0c1207"/>
-      <ellipse cx="58" cy="46" rx="6" ry="7" fill="#0c1207"/>
-      <circle cx="42" cy="45" r="2.6" fill="#b6ff2e"/>
-      <circle cx="58" cy="45" r="2.6" fill="#b6ff2e"/>
-      <!-- drips -->
-      <path d="M40 66 L40 74 M50 68 L50 78 M60 66 L60 73" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-    </symbol>
-  </svg>
   <div class="overlay-inner">
     <div id="ovWin" hidden>
-      <div class="ov-emoji"><svg class="mon win-mon"><use href="#swampmon"/></svg></div>
+      <div class="ov-emoji"><img src="/img/doomps-logo.jpeg" class="mon-img win-mon" alt="DOOMPS" /></div>
       <h2 class="ov-title win" id="ovWinTitle">WAGMI</h2>
       <p class="ov-sub" id="ovWinSub">You won</p>
       <div class="ov-prize" id="ovPrize"></div>
@@ -143,7 +122,7 @@
     <div id="ovRug" hidden>
       <div class="rug-scene">
         <div class="rug-carpet" id="rugCarpet"></div>
-        <div class="rug-monster" id="rugMonster"><svg class="mon"><use href="#swampmon"/></svg></div>
+        <div class="rug-monster" id="rugMonster"><img src="/img/doomps-logo.jpeg" class="mon-img" alt="DOOMPS" /></div>
       </div>
       <h2 class="ov-title rug">RUGGED.</h2>
       <p class="ov-sub" id="ovRugSub">The swamp took everything. Try again tomorrow.</p>

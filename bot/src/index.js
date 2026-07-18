@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Events, MessageFlags } from "discord.js";
+import { Client, GatewayIntentBits, Events, MessageFlags, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import { openDb } from "@doompify/shared/db.js";
 import {
   normalizeAddress,
@@ -38,6 +38,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     unlink: handleUnlink,
     sync: handleSync,
     status: handleStatus,
+    setup: handleSetup,
   }[interaction.commandName];
   if (!h) return;
   try {
@@ -49,6 +50,69 @@ client.on(Events.InteractionCreate, async (interaction) => {
     else interaction.reply(msg);
   }
 });
+
+async function handleSetup(interaction) {
+  // Admin-only: post the branded verification embed into the current channel.
+  const isAdmin = interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild);
+  if (!isAdmin) {
+    return interaction.reply(eph("Only server managers can post the verification panel."));
+  }
+
+  // Swamp-monster mark. Defaults to a toxic-vial emoji that fits the swamp
+  // theme; set SWAMP_EMOJI to your server's custom DOOMPS emoji for the real
+  // monster, e.g. SWAMP_EMOJI=<:doomps:1234567890>
+  const mon = process.env.SWAMP_EMOJI || "🧪";
+
+  const embed = new EmbedBuilder()
+    .setColor(0xb6ff2e) // DOOMPS acid-lime
+    .setTitle(`${mon} WELCOME TO THE SWAMP`)
+    .setDescription(
+      [
+        "**Prove you crawled out of the swamp.**",
+        "",
+        "Verify that you hold **DOOMPS** to unlock holder roles, the meme gallery, the daily **Memematic 3000** spin, and holder-only channels.",
+        "",
+        "No wallet connect. No signing. No seed phrase. You just drop a one-time code into your OpenSea bio — only the real owner can edit that, so it proves the wallet is yours.",
+      ].join("\n")
+    )
+    .addFields(
+      {
+        name: "🧪 How to verify",
+        value: [
+          "**1.** Run `/verify` and paste your `0x` wallet address.",
+          "**2.** Copy the code it gives you (looks like `doomp:xxxx`).",
+          "**3.** Paste that code into your **OpenSea profile bio** and save it.",
+          "**4.** Come back and run `/confirm`.",
+          "**5.** Get your roles. You can delete the code afterward.",
+        ].join("\n"),
+      },
+      {
+        name: "💀 More commands",
+        value: [
+          "`/wallets` — see your linked wallets (add more with `/verify`)",
+          "`/sync` — re-check your holdings & refresh roles",
+          "`/status` — check your verification status",
+          "`/unlink` — remove a wallet",
+        ].join("\n"),
+      },
+      {
+        name: "☠️ Holdings pool across wallets",
+        value: "Verify multiple wallets and your DOOMPS count adds up for role tiers.",
+      }
+    )
+    .setFooter({ text: `${config.brandName} · NGMI TOGETHER` })
+    .setTimestamp();
+
+  // Optional banner / thumbnail if you host the collection art somewhere public.
+  // Defaults to the mascot logo served by the app itself.
+  const thumb = process.env.EMBED_THUMBNAIL_URL || `${config.clubUrl}/img/doomps-logo.jpeg`;
+  embed.setThumbnail(thumb);
+  if (process.env.EMBED_IMAGE_URL) embed.setImage(process.env.EMBED_IMAGE_URL);
+
+  // Post the public embed in the channel, and confirm privately to the admin.
+  await interaction.channel.send({ embeds: [embed] });
+  return interaction.reply(eph("✅ Verification panel posted."));
+}
 
 async function handleVerify(interaction) {
   let address;
