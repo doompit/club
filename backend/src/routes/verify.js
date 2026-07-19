@@ -66,7 +66,15 @@ export function verifyRouter(db) {
 
     let result;
     try {
-      result = await proveControl({ address, nonce, keys, contract: config.doompsContract, opts: verifyOpts });
+      // OpenSea's API can lag a few seconds behind a freshly-saved bio. If the
+      // account exists but the code isn't there yet, wait briefly and re-check
+      // a couple times before giving up — smooths over propagation delay.
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      for (let attempt = 0; attempt < 3; attempt++) {
+        result = await proveControl({ address, nonce, keys, contract: config.doompsContract, opts: verifyOpts });
+        if (result.controlProven) break;
+        if (attempt < 2) await sleep(3000);
+      }
     } catch (e) {
       return res.status(502).json({ error: `Verification error: ${e.message}` });
     }

@@ -21,6 +21,12 @@ fs.mkdirSync(path.resolve(config.uploadsDir), { recursive: true });
 const db = openDb(config.dbPath);
 
 const app = express();
+// Render (and Cloudflare) put a proxy in front of the app, so the real client
+// IP arrives in the X-Forwarded-For header. Trust the proxy hop so
+// express-rate-limit can identify clients correctly (and not throw
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR). Use a fixed number, not `true`, so IPs
+// can't be spoofed. Override with TRUST_PROXY if your setup has more hops.
+app.set("trust proxy", Number(process.env.TRUST_PROXY || 1));
 app.use(cors());
 app.use(express.json());
 
