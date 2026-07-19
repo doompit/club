@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Swamp Club — DOOMPS</title>
+<meta name="description" content="DOOMPS aren't heroes. They're survivors. A community-driven NFT universe built on internet culture, bad decisions, and embracing the chaos." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --toxic:#b4d000;--toxic-bright:#d6ff2b;--toxic-dim:#7d8f16;--ooze:#3a4a0c;
+    --void:#0a0d06;--void-2:#12160c;--panel:#181d0f;--ash:#8a936f;--glow:0 0 24px rgba(180,208,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:#e7ecd6;font-family:'Space Grotesk',system-ui,sans-serif;overflow-x:hidden;padding-top:62px}
+  @media(max-width:520px){body{padding-top:116px}}
+  a{color:var(--toxic-dim)}
+
+  /* fixed nav */
+  .topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+    padding:12px 20px;background:#0c0f07;border-bottom:1px solid rgba(180,208,0,.16);box-shadow:0 2px 20px rgba(0,0,0,.5)}
+  .topnav a{text-decoration:none;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:8px 14px;border-radius:8px;color:var(--ash);transition:color .15s,background .15s}
+  .topnav a:hover{color:var(--toxic-bright)}
+  .topnav a.active{color:var(--void);background:var(--toxic)}
+  .topnav .brand{display:flex;align-items:center;margin-right:8px;padding:0}
+  .topnav .brand img{height:38px;width:38px;border-radius:9px;object-fit:cover;border:1px solid rgba(180,208,0,.4);box-shadow:0 0 14px rgba(180,208,0,.3)}
+
+  /* hero with portal background */
+  .hero{position:relative;min-height:calc(100vh - 62px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 22px 80px;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;z-index:0;background-image:url('/img/portal.jpeg');background-size:cover;background-position:center;
+    filter:brightness(.42) saturate(1.15)}
+  .hero-bg::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 42%, rgba(10,13,6,.15), rgba(10,13,6,.82) 78%),
+      linear-gradient(to bottom, rgba(10,13,6,.55), rgba(10,13,6,.35) 40%, var(--void) 98%)}
+  .hero-inner{position:relative;z-index:1;max-width:760px}
+  .hero-banner{width:100%;max-width:680px;border-radius:16px;display:block;margin:0 auto 26px;
+    border:1px solid rgba(180,208,0,.35);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 50px rgba(180,208,0,.2)}
+  .lead-survivors{margin-top:6px !important}
+  .eyebrow{font-size:.76rem;letter-spacing:.42em;text-transform:uppercase;color:var(--toxic-bright);font-weight:700;
+    text-shadow:0 0 16px rgba(180,208,0,.7);margin-bottom:20px}
+  h1{font-family:'Rubik Mono One';font-weight:400;line-height:.98;
+    font-size:clamp(2.6rem,8vw,5rem);color:var(--toxic-bright);
+    text-shadow:3px 5px 0 #000,0 0 50px rgba(180,208,0,.4);-webkit-text-stroke:1.5px #000}
+  .hero p{margin:22px auto 0;max-width:560px;font-size:1.12rem;line-height:1.65;color:#e2e7d2;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .hero .survivors{color:var(--toxic-bright);font-weight:700}
+  .doomp-it{font-family:'Rubik Mono One';font-size:clamp(1.6rem,5vw,2.4rem);color:var(--toxic-bright);margin:30px 0 0;
+    -webkit-text-stroke:1px #000;text-shadow:0 0 30px rgba(180,208,0,.5),2px 3px 0 #000;letter-spacing:.02em}
+
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:38px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Rubik Mono One';font-size:.86rem;text-decoration:none;
+    padding:16px 26px;border-radius:12px;transition:transform .12s,box-shadow .15s,background .15s;cursor:pointer;border:none}
+  .btn.primary{background:var(--toxic);color:#0a0d06}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:var(--glow);background:var(--toxic-bright)}
+  .btn.ghost{background:rgba(10,13,6,.5);color:var(--toxic-bright);border:1.5px solid rgba(180,208,0,.4)}
+  .btn.ghost:hover{border-color:var(--toxic);box-shadow:var(--glow)}
+  .btn.soon{opacity:.55;cursor:not-allowed;position:relative}
+  .btn.soon .tag{font-family:'Space Grotesk';font-size:.6rem;letter-spacing:.14em;background:var(--ooze);color:var(--toxic-bright);padding:2px 6px;border-radius:6px;text-transform:uppercase}
+
+  /* social row */
+  .socials{display:flex;gap:12px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+  .social{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:.82rem;
+    color:#c3cbab;background:rgba(10,13,6,.55);border:1px solid rgba(180,208,0,.25);padding:10px 16px;border-radius:999px;transition:border-color .15s,color .15s}
+  .social:hover{border-color:var(--toxic);color:var(--toxic-bright)}
+  .social.disabled{opacity:.5;cursor:not-allowed}
+  .social .soon-dot{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--toxic-dim)}
+  .social svg{width:16px;height:16px;fill:currentColor}
+
+  /* sections */
+  .section{max-width:820px;margin:0 auto;padding:80px 22px}
+  .section h2{font-family:'Rubik Mono One';font-size:clamp(1.6rem,5vw,2.4rem);color:var(--toxic-bright);text-align:center;-webkit-text-stroke:.5px #000;line-height:1.05}
+  .section p{font-size:1.1rem;line-height:1.7;color:#d3dabb;margin:20px auto 0;max-width:620px;text-align:center}
+  .section p .hl{color:var(--toxic-bright);font-weight:700}
+  .divider{display:flex;align-items:center;gap:16px;margin:8px auto;max-width:400px;color:var(--toxic-dim)}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,208,0,.4),transparent)}
+  .divider span{font-size:.85rem;letter-spacing:.3em}
+
+  /* preview strip */
+  .previews{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+  @media(max-width:600px){.previews{grid-template-columns:1fr;max-width:300px;margin-left:auto;margin-right:auto}}
+  .preview{background:var(--panel);border:1px solid rgba(180,208,0,.25);border-radius:16px;overflow:hidden;
+    box-shadow:0 16px 40px rgba(0,0,0,.5);transition:transform .15s,box-shadow .2s,border-color .15s}
+  .preview:hover{transform:translateY(-4px);border-color:var(--toxic);box-shadow:0 20px 50px rgba(0,0,0,.6),var(--glow)}
+  .preview img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+  .preview .label{padding:12px 14px;font-family:'Rubik Mono One';font-size:.78rem;color:var(--toxic-bright);text-align:center;letter-spacing:.02em}
+
+  /* closing */
+  .closing{position:relative;text-align:center;padding:90px 22px;overflow:hidden}
+  .closing-bg{position:absolute;inset:0;z-index:0;background-image:url('/img/portal.jpeg');background-size:cover;background-position:center 40%;filter:brightness(.3) saturate(1.1)}
+  .closing-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,var(--void),rgba(10,13,6,.7) 50%,var(--void))}
+  .closing-inner{position:relative;z-index:1;max-width:640px;margin:0 auto}
+  .closing h2{font-family:'Rubik Mono One';font-size:clamp(1.8rem,6vw,3rem);color:var(--toxic-bright);-webkit-text-stroke:.5px #000;text-shadow:0 0 40px rgba(180,208,0,.4)}
+  .closing p{font-size:1.15rem;color:#e2e7d2;margin-top:18px;line-height:1.6;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .closing .welcome{font-family:'Rubik Mono One';font-size:1.3rem;color:var(--toxic-bright);margin-top:28px;-webkit-text-stroke:.4px #000}
+
+  .footer{text-align:center;padding:40px 22px;border-top:1px solid rgba(180,208,0,.12);color:#5c6347;font-size:.76rem;letter-spacing:.06em}
+  .contract-line{margin-top:30px;font-size:.82rem;color:var(--ash);line-height:1.7}
+  .contract-addr{display:inline-block;margin-top:6px;font-family:monospace;font-size:.8rem;color:var(--toxic-bright);word-break:break-all;text-decoration:none;padding:6px 12px;border:1px solid rgba(180,208,0,.3);border-radius:8px;background:rgba(10,13,6,.5)}
+  .contract-addr:hover{border-color:var(--toxic);box-shadow:0 0 16px rgba(180,208,0,.3)}
+  .footer a{color:var(--toxic-dim);text-decoration:none}
+  .footer a:hover{color:var(--toxic-bright)}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="brand" href="/"><img src="/img/logo.jpeg" alt="The Swamp Club" /></a>
+  <a href="/" class="active">Home</a>
+  <a href="https://club.doomps.xyz/">Verify</a>
+  <a href="https://club.doomps.xyz/chat">The Swamp</a>
+  <a href="https://club.doomps.xyz/memematic">Memematic 3000</a>
+  <a href="https://club.doomps.xyz/gallery">Gallery</a>
+  <a href="/portal">The Portal</a>
+  <a href="/lore">DOOMP Lore</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <img class="hero-banner" src="/img/banner.jpeg" alt="DOOMPS" />
+    <div class="eyebrow">Welcome to the Swamp</div>
+    <p class="lead-survivors"><span class="survivors">DOOMPS aren't heroes. They're survivors.</span></p>
+    <p>Every DOOMP crawled out of the Swamp of Bad Decisions after making one terrible choice too many. Now they spend eternity watching new travelers stumble into the same mistakes.</p>
+    <div class="doomp-it">DOOMP IT.</div>
+
+    <div class="cta-row">
+      <a href="https://club.doomps.xyz/" class="btn primary">Enter The Swamp Club</a>
+      <a href="https://opensea.io/collection/doomps/" target="_blank" rel="noopener" class="btn ghost">View Collection</a>
+      <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener" class="btn ghost">Join Community</a>
+    </div>
+    <div class="socials">
+      <a class="social" href="https://x.com/doomps_" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @doomps_
+      </a>
+      <a class="social" href="https://opensea.io/collection/doomps/" target="_blank" rel="noopener">OpenSea</a>
+      <a class="social" href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
+    </div>
+  </div>
+</header>
+
+<!-- WHAT ARE DOOMPS -->
+<section class="section">
+  <h2>What Are DOOMPS?</h2>
+  <p>DOOMPS is a community-driven NFT universe built around internet culture, bad financial decisions, and embracing the chaos.</p>
+  <p>Every DOOMP is uniquely generated with handcrafted traits inspired by crypto, memes, gaming, and swamp folklore.</p>
+  <div class="divider"><span>✕</span></div>
+  <p>This isn't about pretending to be perfect.<br><span class="hl">It's about surviving your mistakes… with style.</span></p>
+
+  <div class="previews">
+    <div class="preview"><img src="/img/mask.png" alt="Masked DOOMP" /><div class="label">The Getaway</div></div>
+    <div class="preview"><img src="/img/nerd.png" alt="Bandana DOOMP with glasses" /><div class="label">The Strategist</div></div>
+    <div class="preview"><img src="/img/punk.png" alt="Mohawk DOOMP" /><div class="label">The Burnout</div></div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing">
+  <div class="closing-bg"></div>
+  <div class="closing-inner">
+    <h2>Join the Swamp</h2>
+    <p>The portal is opening.<br>The next traveler could be you.</p>
+    <div class="doomp-it" style="margin-top:24px">DOOMP IT.</div>
+    <div class="welcome">Welcome to the Swamp. 🌿😐</div>
+    <div class="cta-row" style="margin-top:34px">
+      <a href="https://club.doomps.xyz/" class="btn primary">Enter The Swamp Club</a>
+      <a href="/portal" class="btn ghost">See the Portal</a>
+    </div>
+    <div class="contract-line">
+      Official contract — always verify before you buy:<br>
+      <a href="https://etherscan.io/address/0xe6eA5D2a9C5204667667671125a9b873b8Ed732D" target="_blank" rel="noopener" class="contract-addr">0xe6eA5D2a9C5204667667671125a9b873b8Ed732D</a>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  THE SWAMP CLUB · NGMI TOGETHER &nbsp;·&nbsp;
+  <a href="https://x.com/doomps_" target="_blank" rel="noopener">@doomps_</a> ·
+  <a href="https://opensea.io/collection/doomps/" target="_blank" rel="noopener">OpenSea</a> ·
+  <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a> ·
+  <a href="https://club.doomps.xyz/">Verify</a> ·
+  <a href="https://club.doomps.xyz/chat">The Swamp</a> ·
+  <a href="https://club.doomps.xyz/memematic">Memematic 3000</a> ·
+  <a href="https://club.doomps.xyz/gallery">Gallery</a> ·
+  <a href="/portal">The Portal</a> ·
+  <a href="/lore">DOOMP Lore</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DOOMP Lore — The Official Lore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --toxic:#b4d000;--toxic-bright:#d6ff2b;--toxic-dim:#7d8f16;--ooze:#3a4a0c;
+    --void:#0a0d06;--void-2:#12160c;--panel:#181d0f;--ash:#8a936f;
+    --glow:0 0 24px rgba(180,208,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:#e7ecd6;font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+  @media(max-width:520px){body{padding-top:116px}}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(circle at 50% -5%,rgba(180,208,0,.1),transparent 55%)}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+    padding:12px 20px;border-bottom:1px solid rgba(180,208,0,.16);background:#0c0f07;box-shadow:0 2px 20px rgba(0,0,0,.5)}
+  nav a{color:var(--ash);text-decoration:none;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    padding:8px 14px;border-radius:8px;transition:color .15s,background .15s}
+  nav a:hover{color:var(--toxic-bright)}
+  nav a.active{color:var(--void);background:var(--toxic)}
+  nav .brand{display:flex;align-items:center;margin-right:8px;padding:0}
+  nav .brand img{height:40px;width:40px;border-radius:9px;object-fit:cover;border:1px solid rgba(180,208,0,.4);box-shadow:0 0 14px rgba(180,208,0,.3)}
+
+  .wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 22px 100px}
+
+  .hero{text-align:center;padding:56px 0 12px}
+  .eyebrow{font-size:.74rem;letter-spacing:.4em;text-transform:uppercase;color:var(--toxic);font-weight:700;text-shadow:0 0 12px rgba(180,208,0,.6)}
+  h1{font-family:'Rubik Mono One';font-weight:400;line-height:.95;margin-top:16px;
+    font-size:clamp(2.4rem,8vw,4.4rem);color:var(--toxic-bright);
+    text-shadow:3px 4px 0 #000,0 0 40px rgba(180,208,0,.3);-webkit-text-stroke:1.5px #000}
+  .hero .face{font-size:2.4rem;margin-top:22px;filter:grayscale(.2)}
+
+  /* section headers */
+  section{margin-top:20px}
+  .sec-head{font-family:'Rubik Mono One';font-size:clamp(1.3rem,4.5vw,1.9rem);color:var(--toxic-bright);
+    margin:56px 0 20px;line-height:1.1;-webkit-text-stroke:.5px #000;
+    display:flex;align-items:baseline;gap:14px}
+  .sec-head .no{font-size:.9rem;color:var(--toxic-dim);flex-shrink:0}
+
+  p{font-size:1.1rem;line-height:1.7;color:#d3dabb;margin:0 0 18px}
+  .lead{font-size:1.24rem;color:#e7ecd6;font-weight:500}
+  .stack{margin:0 0 18px}
+  .stack p{margin:0 0 4px}
+  .whisper{font-style:italic;color:var(--ash)}
+  .mono{font-family:'Rubik Mono One';color:var(--toxic-bright);text-align:center;font-size:1.4rem;margin:30px 0;-webkit-text-stroke:.5px #000}
+
+  .divider{display:flex;align-items:center;gap:16px;margin:10px 0;color:var(--toxic-dim)}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,208,0,.35),transparent)}
+  .divider span{font-size:.85rem;letter-spacing:.3em}
+
+  /* region + legend cards */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:8px 0 10px}
+  @media(max-width:560px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid rgba(180,208,0,.2);border-radius:13px;padding:18px 18px}
+  .card h3{font-family:'Space Grotesk';font-weight:700;font-size:1.05rem;color:var(--toxic-bright);margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .card h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--toxic);flex-shrink:0;box-shadow:0 0 10px rgba(180,208,0,.5)}
+  .card p{font-size:.94rem;line-height:1.5;color:#c3cbab;margin:0}
+
+  /* rules */
+  .rules{margin:10px 0}
+  .rule{display:flex;gap:16px;align-items:center;padding:16px 18px;margin-bottom:10px;
+    background:var(--void-2);border:1px solid rgba(180,208,0,.2);border-radius:12px}
+  .rule .n{font-family:'Rubik Mono One';font-size:1.4rem;color:var(--toxic);flex-shrink:0;width:42px;text-align:center}
+  .rule .txt{font-size:1.08rem;font-weight:500}
+
+  .announcement{margin:26px auto;max-width:460px;text-align:center;padding:30px 24px;
+    background:var(--panel);border:1px solid rgba(180,208,0,.28);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.55)}
+  .announcement .small{font-size:.86rem;color:var(--ash);margin-bottom:12px}
+  .announcement .word{font-family:'Rubik Mono One';font-size:3rem;color:var(--toxic-bright);line-height:1;-webkit-text-stroke:1px #000;text-shadow:0 0 30px rgba(180,208,0,.4)}
+
+  /* motto block */
+  .mottos{margin:56px 0 0;display:grid;gap:12px}
+  .motto{text-align:center;padding:22px;background:var(--panel);border:1px solid rgba(180,208,0,.22);border-radius:14px}
+  .motto .k{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ash);margin-bottom:8px}
+  .motto .v{font-family:'Rubik Mono One';font-size:1.5rem;color:var(--toxic-bright);-webkit-text-stroke:.5px #000}
+
+  .cta-row{margin-top:56px;text-align:center}
+  .cta-row a{display:inline-block;background:var(--toxic);color:#0a0d06;text-decoration:none;
+    font-family:'Rubik Mono One';font-size:.92rem;padding:16px 30px;border-radius:12px;
+    transition:transform .12s,box-shadow .15s,background .15s}
+  .cta-row a:hover{transform:translateY(-2px);box-shadow:var(--glow);background:var(--toxic-bright)}
+
+  .footer{text-align:center;margin-top:70px;padding-top:24px;border-top:1px solid rgba(180,208,0,.12);color:#5c6347;font-size:.74rem;letter-spacing:.06em}
+  .footer a{color:var(--toxic-dim);text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/"><img src="/img/logo.jpeg" alt="The Swamp Club" /></a>
+  <a href="/">Home</a>
+  <a href="https://club.doomps.xyz/">Verify</a>
+  <a href="https://club.doomps.xyz/chat">The Swamp</a>
+  <a href="https://club.doomps.xyz/memematic">Memematic 3000</a>
+  <a href="https://club.doomps.xyz/gallery">Gallery</a>
+  <a href="/portal">The Portal</a>
+  <a href="/lore" class="active">DOOMP Lore</a>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">The Official Lore</div>
+    <h1>DOOMP Lore</h1>
+    <div class="face">😐</div>
+  </header>
+
+  <section>
+    <div class="sec-head">Before Time</div>
+    <div class="stack"><p>Before charts.</p><p>Before blockchains.</p><p>Before money.</p></div>
+    <p class="lead">There was only The Swamp.</p>
+    <p>A massive endless bog floating somewhere between reality and nonsense.</p>
+    <div class="stack"><p>Nobody knows how old it is.</p><p>Nobody knows where it came from.</p><p>And nobody knows why the strange green creatures called Doomps appeared there.</p></div>
+    <p>The oldest records simply say:</p>
+    <p class="whisper">"They have always been here."</p>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The First Doomp</div>
+    <p>The first Doomp emerged from the deepest part of the swamp known as The Tar Pit of Regret.</p>
+    <p>For centuries it sat silently.</p>
+    <div class="stack"><p>Empires rose.</p><p>Empires fell.</p><p>The First Doomp didn't move.</p></div>
+    <p>One day a meteor crashed beside it.</p>
+    <p>The First Doomp blinked once.</p>
+    <p>Then went back to doing nothing.</p>
+    <p>The other Doomps soon followed.</p>
+    <div class="stack"><p>Nobody knows if they are related.</p><p>Nobody knows if they reproduce.</p><p>Nobody even knows if they are alive.</p></div>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The Great Indifference</div>
+    <p>Thousands of years ago, the universe experienced its first major collapse.</p>
+    <div class="stack"><p>Stars exploded.</p><p>Planets vanished.</p><p>Entire civilizations disappeared.</p></div>
+    <p>The Doomps watched.</p>
+    <p>Their reaction:</p>
+    <p class="mono">😐</p>
+    <p>The surviving races became obsessed. They searched for the secret. How could a species remain calm through complete catastrophe?</p>
+    <p>After centuries of study they reached a terrifying conclusion:</p>
+    <p class="lead">Doomps simply don't panic. Ever.</p>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The Swamp of Bad Decisions</div>
+    <p>All Doomps eventually return to the Swamp. The swamp itself is divided into regions:</p>
+    <div class="cards">
+      <div class="card"><h3>Rug Marsh</h3><p>Where broken promises sink beneath the mud.</p></div>
+      <div class="card"><h3>FOMO Falls</h3><p>A waterfall that only appears after you've already missed the opportunity.</p></div>
+      <div class="card"><h3>The Tar Pit of Regret</h3><p>The oldest place in the swamp. Many enter. Few leave.</p></div>
+      <div class="card"><h3>Moon Mountain</h3><p>A giant mountain everyone tries to reach. Nobody knows what's on top.</p></div>
+      <div class="card"><h3>The Great Cope Forest</h3><p>Trees constantly whisper: "It's still early."</p></div>
+    </div>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The Doomp Philosophy</div>
+    <p>Other species seek wealth, power, fame, glory. Doomps seek none of these. Their entire philosophy consists of three rules:</p>
+    <div class="rules">
+      <div class="rule"><div class="n">01</div><div class="txt">Remain Doomped.</div></div>
+      <div class="rule"><div class="n">02</div><div class="txt">Do not panic.</div></div>
+      <div class="rule"><div class="n">03</div><div class="txt">See Rule #1.</div></div>
+    </div>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The Legendary Doomps</div>
+    <div class="cards">
+      <div class="card"><h3>King Doomp</h3><p>The ruler of absolutely nothing. Wears a crown. Has never issued a command.</p></div>
+      <div class="card"><h3>Wizard Doomp</h3><p>Knows the future. Refuses to tell anyone.</p></div>
+      <div class="card"><h3>Golden Doomp</h3><p>Made entirely of gold. Acts exactly the same as every other Doomp.</p></div>
+      <div class="card"><h3>Ghost Doomp</h3><p>Died centuries ago. Still hangs around. Nobody noticed the difference.</p></div>
+      <div class="card"><h3>Glitched Doomp</h3><p>Exists in multiple realities simultaneously. Still unimpressed.</p></div>
+    </div>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">The Great Market Crash</div>
+    <p>The most famous event in Doomp history. One day the entire universe lost 99% of its value.</p>
+    <p>Panic spread everywhere.</p>
+    <div class="stack"><p>Kings fled.</p><p>Merchants cried.</p><p>Entire worlds burned.</p></div>
+    <p>The Doomps gathered for an emergency meeting. After three days of discussion they released their official statement:</p>
+    <div class="announcement">
+      <div class="small">Official statement</div>
+      <div class="word">Doomp.</div>
+    </div>
+    <p>The meeting ended. This remains the shortest official government announcement in recorded history.</p>
+  </section>
+
+  <div class="divider"><span>✕</span></div>
+
+  <section>
+    <div class="sec-head">Modern Day</div>
+    <p>Today 1500 Doomps wander reality.</p>
+    <div class="stack"><p>Some wear crowns.</p><p>Some wear wizard hats.</p><p>Some breathe fire.</p><p>Some are made of lava.</p><p>Some are skeletons.</p><p>Some are cosmic entities older than time itself.</p></div>
+    <p>Yet every single Doomp shares the same expression:</p>
+    <p class="mono">😐</p>
+    <p>Because no matter what happens… The market can crash. The world can end. Aliens can invade. Reality can glitch.</p>
+    <p class="lead">A Doomp remains Doomped.</p>
+  </section>
+
+  <div class="mottos">
+    <div class="motto"><div class="k">Official Motto</div><div class="v">Too Doomped To Panic.</div></div>
+    <div class="motto"><div class="k">Official Greeting</div><div class="v">Stay Doomped.</div></div>
+    <div class="motto"><div class="k">Official Response To Any Situation</div><div class="v">Doomp.</div></div>
+  </div>
+
+  <div class="cta-row">
+    <a href="https://club.doomps.xyz/">Enter the swamp — Pick your fate →</a>
+  </div>
+
+  <div class="footer">
+    THE SWAMP CLUB · NGMI TOGETHER &nbsp;·&nbsp; <a href="/">Home</a> · <a href="https://club.doomps.xyz/">Enter the Club</a> · <a href="/portal">The Portal</a>
+  </div>
+</div>
+</body>
+</html>

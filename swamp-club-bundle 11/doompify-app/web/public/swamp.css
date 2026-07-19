@@ -1,0 +1,203 @@
+/* Swamp page — builds on the DOOMPS tokens in /styles.css */
+
+/* ---- Top nav ---- */
+.topnav {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 20px;
+  padding: 14px 22px; background: rgba(8, 12, 6, 0.82);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+}
+.topnav .brand {
+  font-family: "Fraunces", "Arial Black", sans-serif; font-weight: 900;
+  font-size: 22px; letter-spacing: 0.08em; color: var(--slime);
+  text-decoration: none; text-shadow: 0 0 18px var(--toxic-glow);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.brand-logo {
+  width: 38px; height: 38px; border-radius: 8px; object-fit: cover;
+  box-shadow: 0 0 12px var(--toxic-glow);
+}
+.navlinks { display: flex; gap: 18px; margin-left: 8px; flex: 1; flex-wrap: wrap; }
+.navlinks a {
+  font-family: "Space Mono", monospace; font-size: 13px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--bone-dim); text-decoration: none; padding: 4px 0;
+}
+.navlinks a:hover, .navlinks a.active { color: var(--slime); }
+.nav-user { display: flex; align-items: center; gap: 12px; }
+.whoami { font-family: "Space Mono", monospace; font-size: 12px; color: var(--slime); }
+
+.stage.wide { max-width: 1080px; }
+
+/* ---- Section headers ---- */
+.sec-head { text-align: center; margin: 30px 0 34px; }
+.sec-head.left { text-align: left; }
+.title2 {
+  font-family: "Fraunces", "Arial Black", serif; font-weight: 900;
+  font-size: clamp(26px, 4.5vw, 40px); color: var(--bone);
+}
+.rugword, .rug-word { color: var(--bad); font-weight: 700; }
+
+/* ================= WHEEL MACHINE ================= */
+.machine {
+  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+  gap: 34px; align-items: center;
+  background: linear-gradient(180deg, rgba(40,60,20,0.18), rgba(10,14,7,0.5));
+  border: 1px solid var(--line); border-radius: 20px; padding: 34px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 50px rgba(120,180,30,0.08);
+}
+@media (max-width: 780px) { .machine { grid-template-columns: 1fr; } }
+
+.wheel-wrap { position: relative; width: 100%; max-width: 520px; margin: 0 auto; aspect-ratio: 1; }
+#wheel { width: 100%; height: 100%; display: block;
+  filter: drop-shadow(0 0 30px rgba(120,180,30,0.25));
+  transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
+.wheel-hub {
+  position: absolute; inset: 38% 38%; border-radius: 50%;
+  background: radial-gradient(circle, #1a2410, #0c1207);
+  border: 3px solid var(--slime); display: grid; place-items: center;
+  box-shadow: 0 0 24px var(--toxic-glow), inset 0 0 18px rgba(0,0,0,0.7); z-index: 3;
+  overflow: hidden;
+}
+.hub-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.wheel-hub span {
+  font-family: "Fraunces", "Arial Black", sans-serif; font-weight: 900;
+  color: var(--slime); font-size: clamp(14px, 3vw, 22px); letter-spacing: 0.06em;
+}
+.wheel-pointer {
+  position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent;
+  border-top: 30px solid var(--slime); z-index: 4;
+  filter: drop-shadow(0 0 10px var(--toxic-glow));
+}
+
+.machine-side { display: flex; flex-direction: column; gap: 18px; }
+.odds-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: rgba(0,0,0,0.3); }
+.odds-title {
+  font-family: "Space Mono", monospace; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--slime); margin-bottom: 12px;
+}
+.odds-list { list-style: none; display: grid; gap: 9px; }
+.odds-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.odds-list .ol-name { flex: 1; color: var(--bone); }
+.odds-list .ol-pct { font-family: "Space Mono", monospace; color: var(--bone-dim); }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.dot.big { background: #b6ff2e; box-shadow: 0 0 10px #b6ff2e; }
+.dot.medium { background: #79d41f; }
+.dot.small { background: #4e8f16; }
+.dot.tiny { background: #6a7d2a; }
+.dot.rug { background: var(--bad); box-shadow: 0 0 10px rgba(230,96,63,0.6); }
+
+.btn-lever { width: 100%; padding: 18px; font-size: 17px; letter-spacing: 0.06em; }
+.btn-lever:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.spin-status { font-size: 13px; color: var(--bone-dim); min-height: 18px; text-align: center; }
+.spin-status.err { color: var(--bad); }
+.spin-status.ok { color: var(--slime); }
+
+/* ================= UPLOAD ================= */
+.upload-panel { margin-top: 46px; }
+.dropzone {
+  border: 2px dashed var(--slime-deep); border-radius: 14px; padding: 30px;
+  text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  background: rgba(0,0,0,0.25); position: relative; overflow: hidden;
+}
+.dropzone:hover, .dropzone.drag { border-color: var(--slime); background: rgba(182,255,46,0.05); }
+.dz-icon { font-size: 34px; color: var(--slime); margin-bottom: 8px; }
+.dz-inner p { color: var(--bone-dim); }
+.dz-inner strong { color: var(--bone); }
+.dz-sub { font-size: 12px; margin-top: 4px; }
+.dz-preview { max-height: 280px; max-width: 100%; border-radius: 8px; }
+.caption-input {
+  width: 100%; margin-top: 14px; height: 48px;
+  background: rgba(0,0,0,0.45); border: 1px solid var(--line); color: var(--bone);
+  font-family: "Inter", sans-serif; font-size: 15px; padding: 0 16px; border-radius: 8px;
+}
+.caption-input:focus { outline: none; border-color: var(--slime); box-shadow: 0 0 0 3px rgba(182,255,46,0.15); }
+.upload-panel .btn-wide { margin-top: 14px; }
+
+/* ================= GALLERY ================= */
+#gallery { margin-top: 56px; }
+.masonry { columns: 3 240px; column-gap: 16px; }
+@media (max-width: 640px) { .masonry { columns: 2 150px; column-gap: 10px; } }
+.meme-card {
+  break-inside: avoid; margin-bottom: 16px; border: 1px solid var(--line);
+  border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.3);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.4); transition: transform 0.15s, box-shadow 0.2s;
+}
+.meme-card:hover { transform: translateY(-3px); box-shadow: 0 0 26px rgba(182,255,46,0.16); }
+.meme-card img { width: 100%; display: block; }
+.meme-meta { padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.meme-cap { font-size: 13px; color: var(--bone); overflow: hidden; text-overflow: ellipsis; }
+.meme-user { font-family: "Space Mono", monospace; font-size: 11px; color: var(--slime); flex-shrink: 0; }
+.gallery-empty { text-align: center; color: var(--bone-dim); padding: 40px; font-style: italic; }
+#btnMore { display: block; margin: 22px auto 0; }
+
+/* ================= RESULT OVERLAY ================= */
+.overlay {
+  position: fixed; inset: 0; z-index: 60; display: grid; place-items: center;
+  background: rgba(4, 7, 3, 0.86); backdrop-filter: blur(6px);
+}
+.overlay[hidden] { display: none; }
+.overlay-inner {
+  text-align: center; max-width: 460px; padding: 40px 30px;
+  animation: pop 0.3s ease;
+}
+@keyframes pop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ov-emoji { display: flex; justify-content: center; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.ov-title { font-family: "Fraunces","Arial Black",sans-serif; font-weight: 900; font-size: clamp(40px, 9vw, 72px); margin: 10px 0; }
+.ov-title.win { color: var(--slime); text-shadow: 0 0 30px var(--toxic-glow); }
+.ov-title.rug { color: var(--bad); text-shadow: 0 0 30px rgba(230,96,63,0.5); }
+.ov-sub { color: var(--bone-dim); font-size: 16px; }
+.ov-prize {
+  margin-top: 18px; font-family: "Space Mono", monospace; font-size: 22px; color: var(--slime);
+  border: 1px solid var(--slime); border-radius: 10px; padding: 14px; background: rgba(182,255,46,0.08);
+}
+.ov-close { margin-top: 26px; }
+
+/* Rug pull animation: the carpet yanks out from under the swamp monster, it falls */
+.rug-scene { position: relative; height: 200px; overflow: hidden; }
+.rug-carpet {
+  position: absolute; bottom: 40px; left: 50%; width: 220px; height: 26px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(90deg, #7d2429 0 14px, #a33 14px 28px);
+  border-radius: 4px;
+}
+.rug-carpet.pull { animation: yank 0.7s cubic-bezier(0.7,0,0.9,0.3) forwards; }
+@keyframes yank { to { transform: translateX(-600px) rotate(-8deg); } }
+.rug-monster { position: absolute; bottom: 66px; left: 50%; transform: translateX(-50%); }
+.rug-monster.fall { animation: plunge 0.9s ease-in 0.35s forwards; }
+@keyframes plunge {
+  0% { transform: translateX(-50%) translateY(0) rotate(0); }
+  100% { transform: translateX(-50%) translateY(180px) rotate(220deg); opacity: 0.2; }
+}
+
+/* Swamp monster mark */
+.mon { width: 72px; height: 72px; color: var(--slime); display: block; filter: drop-shadow(0 0 16px var(--toxic-glow)); }
+.rug-monster .mon { width: 64px; height: 64px; }
+.mon-img {
+  width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--slime); box-shadow: 0 0 24px var(--toxic-glow);
+  display: block;
+}
+.rug-monster .mon-img { width: 72px; height: 72px; }
+.win-mon { animation: bob 1.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  #wheel { transition: none; }
+  .ov-emoji, .rug-carpet.pull, .rug-monster.fall, .win-mon { animation: none; }
+}
+
+/* Winner prize claim */
+.claim { margin-top: 22px; }
+.claim-label { font-size: 14px; color: var(--bone-dim); margin-bottom: 10px; }
+.claim-row { display: flex; gap: 10px; }
+.claim-row input {
+  flex: 1; height: 48px; background: rgba(0,0,0,0.5); border: 1px solid var(--line);
+  color: var(--bone); font-family: "Space Mono", monospace; font-size: 14px;
+  padding: 0 14px; border-radius: 8px; min-width: 0;
+}
+.claim-row input:focus { outline: none; border-color: var(--slime); box-shadow: 0 0 0 3px rgba(182,255,46,0.15); }
+.claim-done {
+  margin-top: 20px; padding: 14px 16px; border: 1px solid var(--slime); border-radius: 10px;
+  background: rgba(182,255,46,0.08); color: var(--slime); font-size: 14px;
+}

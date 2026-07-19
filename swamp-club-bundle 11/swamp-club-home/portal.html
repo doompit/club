@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Portal of No Return — DOOMPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --toxic:#b4d000;--toxic-bright:#d6ff2b;--toxic-dim:#7d8f16;--ooze:#3a4a0c;
+    --void:#0a0d06;--void-2:#12160c;--panel:#181d0f;--ash:#8a936f;
+    --glow:0 0 24px rgba(180,208,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:#e7ecd6;font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+  @media(max-width:520px){body{padding-top:116px}}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(circle at 50% -5%,rgba(180,208,0,.12),transparent 55%),radial-gradient(circle at 50% 110%,rgba(180,208,0,.1),transparent 55%)}
+
+  /* nav */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+    padding:12px 20px;border-bottom:1px solid rgba(180,208,0,.16);background:#0c0f07;box-shadow:0 2px 20px rgba(0,0,0,.5)}
+  nav a{color:var(--ash);text-decoration:none;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    padding:8px 14px;border-radius:8px;transition:color .15s,background .15s}
+  nav a:hover{color:var(--toxic-bright)}
+  nav a.active{color:var(--void);background:var(--toxic)}
+  nav .brand{display:flex;align-items:center;margin-right:8px;padding:0}
+  nav .brand img{height:40px;width:40px;border-radius:9px;object-fit:cover;border:1px solid rgba(180,208,0,.4);box-shadow:0 0 14px rgba(180,208,0,.3)}
+
+  .wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:0 22px 100px}
+
+  /* hero */
+  .hero{position:relative;text-align:center;padding:44px 0 10px}
+  .portal-frame{position:relative;max-width:560px;margin:0 auto 8px}
+  .portal-frame img{width:100%;border-radius:16px;display:block;
+    border:1px solid rgba(180,208,0,.3);box-shadow:0 0 60px rgba(120,180,0,.28),0 24px 70px rgba(0,0,0,.7)}
+  .portal-frame::after{content:"";position:absolute;inset:-2px;border-radius:18px;pointer-events:none;
+    box-shadow:inset 0 0 40px rgba(180,208,0,.15);animation:pulse 4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+  .eyebrow{margin-top:30px;font-size:.74rem;letter-spacing:.4em;text-transform:uppercase;color:var(--toxic);font-weight:700;
+    text-shadow:0 0 12px rgba(180,208,0,.6)}
+  h1{font-family:'Rubik Mono One';font-weight:400;line-height:.95;margin-top:16px;
+    font-size:clamp(2.2rem,7vw,4rem);color:var(--toxic-bright);
+    text-shadow:3px 4px 0 #000,0 0 40px rgba(180,208,0,.3);-webkit-text-stroke:1.5px #000}
+
+  /* body copy */
+  .lore{margin-top:44px;font-size:1.12rem;line-height:1.75;color:#d3dabb}
+  .lore p{margin:0 0 22px}
+  .lore .lead{font-size:1.28rem;color:#e7ecd6;font-weight:500}
+  .lore .whisper{font-style:italic;color:var(--ash)}
+  .lore .beat{font-family:'Rubik Mono One';font-size:1.15rem;color:var(--toxic-bright);
+    text-align:center;margin:38px 0;letter-spacing:.01em;line-height:1.4;-webkit-text-stroke:.5px #000}
+  .divider{display:flex;align-items:center;gap:16px;margin:44px 0;color:var(--toxic-dim)}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,208,0,.4),transparent)}
+  .divider span{font-size:.9rem;letter-spacing:.3em}
+
+  .creed{margin:52px auto 0;max-width:560px;text-align:center;padding:34px 28px;
+    background:var(--panel);border:1px solid rgba(180,208,0,.28);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+  .creed .small{font-size:.9rem;color:var(--ash);margin-bottom:10px}
+  .creed .big{font-family:'Rubik Mono One';font-size:clamp(1.8rem,6vw,2.8rem);color:var(--toxic-bright);
+    line-height:1;text-shadow:2px 3px 0 #000,0 0 30px rgba(180,208,0,.35);-webkit-text-stroke:1px #000}
+
+  .cta-row{margin-top:48px;text-align:center}
+  .cta-row a{display:inline-block;background:var(--toxic);color:#0a0d06;text-decoration:none;
+    font-family:'Rubik Mono One';font-size:.92rem;padding:16px 30px;border-radius:12px;
+    transition:transform .12s,box-shadow .15s,background .15s}
+  .cta-row a:hover{transform:translateY(-2px);box-shadow:var(--glow);background:var(--toxic-bright)}
+
+  .footer{text-align:center;margin-top:70px;padding-top:24px;border-top:1px solid rgba(180,208,0,.12);color:#5c6347;font-size:.74rem;letter-spacing:.06em}
+  .footer a{color:var(--toxic-dim);text-decoration:none}
+
+  @media (prefers-reduced-motion:reduce){.portal-frame::after{animation:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/"><img src="/img/logo.jpeg" alt="The Swamp Club" /></a>
+  <a href="/">Home</a>
+  <a href="https://club.doomps.xyz/">Verify</a>
+  <a href="https://club.doomps.xyz/chat">The Swamp</a>
+  <a href="https://club.doomps.xyz/memematic">Memematic 3000</a>
+  <a href="https://club.doomps.xyz/gallery">Gallery</a>
+  <a href="/portal" class="active">The Portal</a>
+  <a href="/lore">DOOMP Lore</a>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="portal-frame"><img src="/img/portal.jpeg" alt="The Portal of No Return glowing green in the swamp" /></div>
+    <div class="eyebrow">Swamp of Bad Decisions</div>
+    <h1>The Portal<br>of No Return</h1>
+  </header>
+
+  <div class="lore">
+    <p class="lead">Nobody knows who built it.</p>
+    <p>Some say it appeared after the first legendary rug pull. Others believe it formed from millions of bad decisions made across every blockchain at the exact same moment. Whatever the truth is, one thing has never changed…</p>
+    <p class="beat">The Portal is always waiting.</p>
+    <p>Hidden deep within the Swamp of Bad Decisions, beneath thick fog and glowing green water, an ancient doorway hums with strange energy. It doesn't lead to another place.</p>
+    <p class="whisper">It leads to another version of yourself.</p>
+
+    <div class="divider"><span>✕</span></div>
+
+    <p class="beat">Every DOOMP must choose.</p>
+    <p>Walk away… and live an ordinary life.</p>
+    <p>Or step through the Portal and leave behind fear, hesitation, and common sense.</p>
+    <p>The moment a DOOMP crosses the threshold, the swamp judges them. Their appearance twists into something completely unique. Some emerge wearing crowns made of garbage. Others gain lava skin, glowing eyes, wizard hats, rubber ducks, halos, or stranger mutations no one can explain.</p>
+    <p class="whisper">No two journeys are the same.</p>
+
+    <div class="divider"><span>✕</span></div>
+
+    <p>The Portal doesn't reward intelligence.</p>
+    <p class="beat">It rewards conviction.</p>
+    <p>The brave become legends.<br>The lucky become memes.<br>The reckless become mythology.</p>
+    <p class="whisper">Some never return at all.</p>
+    <p>Those who survive are forever known as DOOMPS—creatures born from chaos, fueled by conviction, and united by one unbreakable belief:</p>
+
+    <div class="creed">
+      <div class="small">When the world says "Don't"…</div>
+      <div class="big">DOOMP IT.</div>
+    </div>
+
+    <div class="divider"><span>✕</span></div>
+
+    <p>Every trait tells the story of a choice made inside the Portal. Every rarity marks a different path through its impossible maze. Every collection is another generation of travelers willing to risk everything for a chance to become part of the legend.</p>
+    <p class="beat">The Portal still stands.</p>
+    <p>Its green light cuts through the swamp every night.</p>
+    <p class="whisper">Waiting. Watching. Calling the next DOOMP home.</p>
+  </div>
+
+  <div class="cta-row">
+    <a href="https://club.doomps.xyz/">Step through — Pick your fate →</a>
+  </div>
+
+  <div class="footer">
+    THE SWAMP CLUB · NGMI TOGETHER &nbsp;·&nbsp; <a href="/">Home</a> · <a href="https://club.doomps.xyz/">Enter the Club</a> · <a href="/lore">DOOMP Lore</a>
+  </div>
+</div>
+</body>
+</html>
