@@ -74,10 +74,10 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true      # Render generates a strong random value
-      # OAuth callback URLs (must match what you register in Discord):
-      - key: DISCORD_REDIRECT_URI
-        value: https://club.doomps.xyz/auth/discord/callback
-      - key: USER_REDIRECT_URI
-        value: https://club.doomps.xyz/auth/user/callback
-      - key: ADMIN_REDIRECT_URI
-        value: https://club.doomps.xyz/admin/api/callback
+      # NOTE: The three OAuth callback URLs auto-derive from PUBLIC_URL, so you
+      # do NOT need to set them here. With PUBLIC_URL=https://club.doomps.xyz the
+      # app uses:
+      #   https://club.doomps.xyz/auth/discord/callback
+      #   https://club.doomps.xyz/auth/user/callback
+      #   https://club.doomps.xyz/admin/api/callback
+      # Register those three in Discord → OAuth2 → Redirects.
