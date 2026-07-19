@@ -4,6 +4,7 @@ import {
   generateNonce,
   buildChallengeString,
   proveControl,
+  isHolderOfCollection,
   CHALLENGE_TTL_MS,
 } from "@doompify/shared";
 import {
@@ -65,13 +66,39 @@ export function verifyRouter(db) {
 
     let result;
     try {
-      result = await proveControl({ address, nonce, keys, opts: verifyOpts });
+      result = await proveControl({ address, nonce, keys, contract: config.doompsContract, opts: verifyOpts });
     } catch (e) {
       return res.status(502).json({ error: `Verification error: ${e.message}` });
     }
 
     if (!result.controlProven) {
       return res.status(200).json({ ok: false, ...result });
+    }
+
+    // Control proven. Now check the wallet actually holds DOOMPS, so we can give
+    // a clear "no DOOMPS found" message instead of a confusing failure.
+    if (config.doompsContract) {
+      try {
+        const { isHolder } = await isHolderOfCollection(
+          address,
+          config.doompsContract,
+          keys.alchemy,
+          verifyOpts
+        );
+        if (!isHolder) {
+          return res.status(200).json({
+            ok: false,
+            controlProven: true,
+            holdsDoomps: false,
+            reason:
+              "Wallet verified, but no DOOMPS were found in it. Link a wallet that holds DOOMPS, or buy one and try again.",
+          });
+        }
+      } catch (e) {
+        // Don't hard-fail verification on a holdings-check blip — control is
+        // already proven; roles get re-synced on a schedule anyway.
+        console.error("Holder check during confirm failed:", e.message);
+      }
     }
 
     consumeChallenge(db, challenge.id);

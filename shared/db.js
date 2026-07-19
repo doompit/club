@@ -133,6 +133,17 @@ export function openDb(path) {
       UNIQUE(message_id, discord_id, emoji)
     );
     CREATE INDEX IF NOT EXISTS idx_rx_msg ON reactions(message_id);
+
+    -- Swamp member profiles: display name, bio, and an avatar chosen from one
+    -- of the member's linked DOOMPS NFTs (stored as its image URL + token id).
+    CREATE TABLE IF NOT EXISTS profiles (
+      discord_id     TEXT PRIMARY KEY,
+      display_name   TEXT,
+      bio            TEXT,
+      avatar_url     TEXT,          -- image URL of the chosen NFT
+      avatar_token   TEXT,          -- token id of the chosen NFT
+      updated_at     INTEGER NOT NULL
+    );
   `);
   migrateColumns(db);
   seedPrizeConfig(db);
@@ -564,4 +575,54 @@ export function seedDefaultChannels(db, { guildId, now }) {
     });
   }
   return true;
+}
+
+/* ===================== Swamp profiles ===================== */
+
+/** Read a profile (or null). */
+export function getProfile(db, discordId) {
+  return db.prepare(`SELECT * FROM profiles WHERE discord_id = ?`).get(discordId) || null;
+}
+
+/**
+ * Create or update a member's profile. Only provided fields are changed.
+ * avatar_url + avatar_token are set together (the chosen NFT).
+ */
+export function upsertProfile(db, { discordId, displayName, bio, avatarUrl, avatarToken, now }) {
+  const existing = getProfile(db, discordId);
+  const next = {
+    display_name: displayName !== undefined ? displayName : existing?.display_name ?? null,
+    bio: bio !== undefined ? bio : existing?.bio ?? null,
+    avatar_url: avatarUrl !== undefined ? avatarUrl : existing?.avatar_url ?? null,
+    avatar_token: avatarToken !== undefined ? avatarToken : existing?.avatar_token ?? null,
+  };
+  db.prepare(`
+    INSERT INTO profiles (discord_id, display_name, bio, avatar_url, avatar_token, updated_at)
+    VALUES (@discord_id, @display_name, @bio, @avatar_url, @avatar_token, @updated_at)
+    ON CONFLICT(discord_id) DO UPDATE SET
+      display_name = @display_name,
+      bio          = @bio,
+      avatar_url   = @avatar_url,
+      avatar_token = @avatar_token,
+      updated_at   = @updated_at
+  `).run({ discord_id: discordId, ...next, updated_at: now });
+  return getProfile(db, discordId);
+}
+
+/**
+ * Fetch profiles for a set of discord ids at once -> { discordId: {name, avatar} }.
+ * Used to decorate chat messages and gallery items with avatar + display name.
+ */
+export function profilesFor(db, discordIds) {
+  const ids = [...new Set(discordIds)].filter(Boolean);
+  if (!ids.length) return {};
+  const ph = ids.map(() => "?").join(",");
+  const rows = db.prepare(
+    `SELECT discord_id, display_name, avatar_url FROM profiles WHERE discord_id IN (${ph})`
+  ).all(...ids);
+  const out = {};
+  for (const r of rows) {
+    out[r.discord_id] = { displayName: r.display_name, avatarUrl: r.avatar_url };
+  }
+  return out;
 }

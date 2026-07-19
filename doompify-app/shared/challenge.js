@@ -45,7 +45,16 @@ export function buildChallengeString(address, nonce) {
  */
 export function bioContainsChallenge(bioText, challengeString) {
   if (!bioText || typeof bioText !== "string") return false;
-  return bioText.includes(challengeString);
+  // Robust match: OpenSea bios often come back with odd spacing, line breaks,
+  // smart punctuation, or invisible characters. Normalize both sides before
+  // comparing so a correctly-pasted code isn't rejected over formatting.
+  const norm = (s) =>
+    s
+      .normalize("NFKC")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "") // zero-width chars
+      .replace(/\s+/g, "")                    // all whitespace
+      .toLowerCase();
+  return norm(bioText).includes(norm(challengeString));
 }
 
 export const CHALLENGE_TTL_MS = 30 * 60 * 1000; // 30 minutes
