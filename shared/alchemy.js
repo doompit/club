@@ -28,8 +28,8 @@ export async function fetchWithRetry(fetchImpl, url, opts = {}, tries = 3) {
 
 /**
  * Check whether `address` owns at least one NFT from `contractAddress`
- * using Alchemy's NFT API (isHolderOfCollection is cheapest/most direct):
- *   GET /nft/v3/{apiKey}/isHolderOfCollection?wallet=...&contractAddress=...
+ * using Alchemy's NFT API (isHolderOfContract is cheapest/most direct):
+ *   GET /nft/v3/{apiKey}/isHolderOfContract?wallet=...&contractAddress=...
  *
  * Returns { isHolder: boolean }.
  */
@@ -43,7 +43,7 @@ export async function isHolderOfCollection(
   const contract = normalizeAddress(contractAddress);
 
   const base = `https://${network}.g.alchemy.com/nft/v3/${apiKey}`;
-  const url = `${base}/isHolderOfCollection?wallet=${wallet}&contractAddress=${contract}`;
+  const url = `${base}/isHolderOfContract?wallet=${wallet}&contractAddress=${contract}`;
 
   const res = await fetchWithRetry(fetchImpl, url, {
     method: "GET",
@@ -56,7 +56,14 @@ export async function isHolderOfCollection(
   }
 
   const data = await res.json();
-  return { isHolder: Boolean(data.isHolderOfCollection) };
+  // Endpoint returns { isHolderOfContract: bool }. Read defensively in case the
+  // field name varies across API versions.
+  const held =
+    data.isHolderOfContract ??
+    data.isHolderOfCollection ??
+    data.isHolder ??
+    false;
+  return { isHolder: Boolean(held) };
 }
 
 /**
