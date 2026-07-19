@@ -48,6 +48,17 @@ export async function fetchOpenSeaBio(address, apiKey, { fetchImpl = fetch } = {
   }
 
   const data = await res.json();
+  // Diagnostic: show what OpenSea actually returned so we can see whether `bio`
+  // is missing, empty, or nested. Toggle off with VERIFY_DEBUG=0.
+  if (process.env.VERIFY_DEBUG !== "0") {
+    try {
+      console.log(
+        `[opensea] keys=${Object.keys(data).join(",")} ` +
+        `bio=${JSON.stringify(data.bio ?? null)} ` +
+        `username=${JSON.stringify(data.username ?? null)}`
+      );
+    } catch {}
+  }
   // OpenSea returns `bio` at the top level; read defensively in case the shape
   // varies (some responses nest under `account` or use `description`).
   const bio =
