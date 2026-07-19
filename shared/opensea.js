@@ -15,13 +15,28 @@ export async function fetchOpenSeaBio(address, apiKey, { fetchImpl = fetch } = {
   const addr = normalizeAddress(address);
   const url = `${OPENSEA_BASE}/accounts/${addr}`;
 
-  const res = await fetchImpl(url, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "X-API-KEY": apiKey,
-    },
-  });
+  // Retry transient failures (rate limits / 5xx) a few times with backoff.
+  let res;
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      res = await fetchImpl(url, {
+        method: "GET",
+        headers: { Accept: "application/json", "X-API-KEY": apiKey },
+      });
+    } catch (e) {
+      lastErr = e;
+      await sleep(400 * (attempt + 1));
+      continue;
+    }
+    if (res.status === 429 || res.status >= 500) {
+      lastErr = new Error(`OpenSea temporarily unavailable (${res.status})`);
+      await sleep(500 * (attempt + 1));
+      continue;
+    }
+    break;
+  }
+  if (!res) throw lastErr || new Error("OpenSea request failed");
 
   if (res.status === 404) {
     // Account has never been touched on OpenSea -> no profile / no bio.
@@ -39,4 +54,8 @@ export async function fetchOpenSeaBio(address, apiKey, { fetchImpl = fetch } = {
     username: data.username ?? null,
     exists: true,
   };
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
 }

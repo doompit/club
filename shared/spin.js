@@ -49,33 +49,32 @@ export function secureUnit() {
 /**
  * The wheel face: ordered segments the UI renders around the circle.
  * `kind` is win|rug (for color/animation); `tier` maps winning segments to a
- * payout tier. Losing segments are all 'rug'. The labels are flavor only —
- * odds come from OUTCOME_WEIGHTS, not from how many segments share a tier.
+ * payout tier. Losing segments are all 'rug'. Each has an `emoji` for flair.
+ * The labels/emojis are flavor only — odds come from OUTCOME_WEIGHTS, not from
+ * how many segments share a tier.
  *
- * We interleave rug segments between wins so the wheel looks fair and lands
- * believably on a rug half the time.
+ * 16 slices: 8 win + 8 rug, interleaved so the wheel looks fair and lands on a
+ * rug half the time. Adding/removing slices does NOT change the odds — the real
+ * result is picked by pickOutcome() using OUTCOME_WEIGHTS, then we land the
+ * wheel on a matching slice.
  */
 export const WHEEL_SEGMENTS = [
-  { label: "WAGMI", kind: "win", tier: "big" },
-  { label: "REKT", kind: "rug" },
-  { label: "MOON", kind: "win", tier: "medium" },
-  { label: "NGMI", kind: "rug" },
-  { label: "GM", kind: "win", tier: "small" },
-  { label: "RUGGED", kind: "rug" },
-  { label: "PUMP", kind: "win", tier: "tiny" },
-  { label: "-100%", kind: "rug" },
-  { label: "DIAMOND HANDS", kind: "win", tier: "medium" },
-  { label: "PAPER HANDS", kind: "rug" },
-  { label: "LFG", kind: "win", tier: "small" },
-  { label: "JEETED", kind: "rug" },
-  { label: "HODL", kind: "win", tier: "tiny" },
-  { label: "DUMP", kind: "rug" },
-  { label: "APE IN", kind: "win", tier: "small" },
-  { label: "LIQUIDATED", kind: "rug" },
-  { label: "GG", kind: "win", tier: "tiny" },
-  { label: "EXIT SCAM", kind: "rug" },
-  { label: "SER", kind: "win", tier: "tiny" },
-  { label: "COPE", kind: "rug" },
+  { label: "WAGMI", emoji: "🚀", kind: "win", tier: "big" },
+  { label: "REKT", emoji: "💀", kind: "rug" },
+  { label: "MOON", emoji: "🌕", kind: "win", tier: "medium" },
+  { label: "NGMI", emoji: "📉", kind: "rug" },
+  { label: "GM", emoji: "☀️", kind: "win", tier: "small" },
+  { label: "RUGGED", emoji: "🫠", kind: "rug" },
+  { label: "PUMP", emoji: "📈", kind: "win", tier: "tiny" },
+  { label: "DUMP", emoji: "🗑️", kind: "rug" },
+  { label: "DIAMOND", emoji: "💎", kind: "win", tier: "medium" },
+  { label: "PAPER", emoji: "🧻", kind: "rug" },
+  { label: "LFG", emoji: "🔥", kind: "win", tier: "small" },
+  { label: "JEETED", emoji: "🤡", kind: "rug" },
+  { label: "HODL", emoji: "🐸", kind: "win", tier: "tiny" },
+  { label: "COPE", emoji: "😭", kind: "rug" },
+  { label: "GIGACHAD", emoji: "🗿", kind: "win", tier: "big" },
+  { label: "EXIT SCAM", emoji: "🏃", kind: "rug" },
 ];
 
 /**
