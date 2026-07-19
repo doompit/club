@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Events, MessageFlags, EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { Client, GatewayIntentBits, Events, MessageFlags, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { openDb } from "@doompify/shared/db.js";
 import {
   normalizeAddress,
@@ -72,36 +72,41 @@ async function handleSetup(interaction) {
         "",
         "Verify that you hold **DOOMPS** to unlock holder roles, the meme gallery, the daily **Memematic 3000** spin, and holder-only channels.",
         "",
-        "No wallet connect. No signing. No seed phrase. You just drop a one-time code into your OpenSea bio — only the real owner can edit that, so it proves the wallet is yours.",
+        "No wallet connect. No signing. No seed phrase — you just paste a one-time code into your OpenSea bio. Only the real owner can edit that, so it proves the wallet is yours. **You only do this once** — after that your roles stay in sync automatically.",
       ].join("\n")
     )
     .addFields(
       {
-        name: "🧪 How to verify",
+        name: "✅ Easiest way — verify on the site",
         value: [
-          "**1.** Run `/verify` and paste your `0x` wallet address.",
-          "**2.** Copy the code it gives you (looks like `doomp:xxxx`).",
-          "**3.** Paste that code into your **OpenSea profile bio** and save it.",
-          "**4.** Come back and run `/confirm`.",
-          "**5.** Get your roles. You can delete the code afterward.",
+          `**[Click here to verify →](${config.clubUrl}/)**`,
+          "Log in with Discord, paste your wallet, drop the code in your OpenSea bio, done. Roles are applied automatically.",
         ].join("\n"),
       },
       {
-        name: "💀 More commands",
+        name: "🧪 Or verify here with commands",
         value: [
-          "`/wallets` — see your linked wallets (add more with `/verify`)",
-          "`/sync` — re-check your holdings & refresh roles",
-          "`/status` — check your verification status",
-          "`/unlink` — remove a wallet",
+          "**1.** `/verify` + your `0x` address → get a code",
+          "**2.** Paste the code in your **OpenSea bio** & save",
+          "**3.** `/confirm` → get your roles",
         ].join("\n"),
       },
       {
-        name: "☠️ Holdings pool across wallets",
-        value: "Verify multiple wallets and your DOOMPS count adds up for role tiers.",
+        name: "💀 Handy commands",
+        value: "`/wallets` · `/sync` · `/status` · `/unlink` — manage wallets & refresh roles. Holdings pool across every wallet you link.",
       }
     )
     .setFooter({ text: `${config.brandName} · NGMI TOGETHER` })
     .setTimestamp();
+
+  // A big link button to the site — the one-click easy path.
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("Verify on the Swamp Club")
+      .setEmoji("🧪")
+      .setURL(`${config.clubUrl}/`)
+  );
 
   // Optional banner / thumbnail if you host the collection art somewhere public.
   // Defaults to the mascot logo served by the app itself.
@@ -109,8 +114,8 @@ async function handleSetup(interaction) {
   embed.setThumbnail(thumb);
   if (process.env.EMBED_IMAGE_URL) embed.setImage(process.env.EMBED_IMAGE_URL);
 
-  // Post the public embed in the channel, and confirm privately to the admin.
-  await interaction.channel.send({ embeds: [embed] });
+  // Post the public embed + link button in the channel, confirm privately.
+  await interaction.channel.send({ embeds: [embed], components: [row] });
   return interaction.reply(eph("✅ Verification panel posted."));
 }
 

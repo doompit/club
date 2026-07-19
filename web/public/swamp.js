@@ -113,52 +113,103 @@ function drawWheel() {
   const ctx = canvas.getContext("2d");
   const segs = state.segments.length ? state.segments : fallbackSegs();
   const n = segs.length;
-  const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width / 2 - 6;
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width / 2 - 8;
   const arc = (2 * Math.PI) / n;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   for (let i = 0; i < n; i++) {
     const seg = segs[i];
     const start = i * arc - Math.PI / 2;
     const end = start + arc;
+    const mid = start + arc / 2;
+
+    // wedge with a soft radial gradient for depth
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, end);
     ctx.closePath();
-    if (seg.kind === "rug") {
-      ctx.fillStyle = RUG_COLORS[i % 2];
-    } else {
-      ctx.fillStyle = TIER_COLOR[seg.tier] || "#4e8f16";
-    }
+    const base = seg.kind === "rug" ? RUG_COLORS[i % 2] : (TIER_COLOR[seg.tier] || "#4e8f16");
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.15, cx, cy, r);
+    grad.addColorStop(0, shade(base, 18));
+    grad.addColorStop(1, shade(base, -12));
+    ctx.fillStyle = grad;
     ctx.fill();
-    ctx.strokeStyle = "rgba(0,0,0,0.4)";
-    ctx.lineWidth = 2;
+
+    // crisp dark divider between slices
+    ctx.strokeStyle = "rgba(6,10,4,0.85)";
+    ctx.lineWidth = 3;
     ctx.stroke();
 
-    // label
+    // emoji + label drawn HORIZONTALLY (upright, like Wheel of Fortune) at the
+    // slice's mid-angle — much easier to read than radial text.
+    const emojiSize = Math.max(20, Math.min(34, Math.round(560 / n)));
+    const labelSize = Math.max(11, Math.min(17, Math.round(340 / n)));
+
+    // position along the slice's centerline
+    const emojiR = r * 0.74; // emoji further out
+    const labelR = r * 0.50; // label closer in
+    const ex = cx + Math.cos(mid) * emojiR;
+    const ey = cy + Math.sin(mid) * emojiR;
+    const lx = cx + Math.cos(mid) * labelR;
+    const ly = cy + Math.sin(mid) * labelR;
+
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + arc / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = seg.kind === "rug" ? "#f0c9c2" : "#0c1207";
-    ctx.font = "700 15px 'Space Mono', monospace";
-    ctx.fillText(seg.label, r - 14, 5);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // label (upright)
+    let label = seg.label;
+    if (label.length > 11) label = label.slice(0, 10) + "…";
+    ctx.font = `700 ${labelSize}px 'Space Mono', monospace`;
+    // subtle outline so text stays legible on any wedge color
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = seg.kind === "rug" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.35)";
+    ctx.strokeText(label, lx, ly);
+    ctx.fillStyle = seg.kind === "rug" ? "#ffe9e3" : "#0c1207";
+    ctx.fillText(label, lx, ly);
+
+    // emoji (upright)
+    ctx.font = `${emojiSize}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText(seg.emoji || "", ex, ey);
     ctx.restore();
   }
-  // outer ring
+
+  // hub ring shadow (behind the center logo)
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.20, 0, 2 * Math.PI);
+  ctx.fillStyle = "rgba(6,10,4,0.9)";
+  ctx.fill();
+
+  // bright outer ring
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, 2 * Math.PI);
   ctx.strokeStyle = "#b6ff2e";
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 5;
   ctx.stroke();
+  // inner accent ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 3, 0, 2 * Math.PI);
+  ctx.strokeStyle = "rgba(182,255,46,0.25)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+/** Lighten (+) or darken (-) a hex color by a percentage amount. */
+function shade(hex, amt) {
+  const h = hex.replace("#", "");
+  const num = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  let r = (num >> 16) + amt, g = ((num >> 8) & 0xff) + amt, b = (num & 0xff) + amt;
+  r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
+  return `rgb(${r},${g},${b})`;
 }
 
 function fallbackSegs() {
   return [
-    { label: "WAGMI", kind: "win", tier: "big" }, { label: "REKT", kind: "rug" },
-    { label: "MOON", kind: "win", tier: "medium" }, { label: "NGMI", kind: "rug" },
-    { label: "GM", kind: "win", tier: "small" }, { label: "RUGGED", kind: "rug" },
-    { label: "PUMP", kind: "win", tier: "tiny" }, { label: "-100%", kind: "rug" },
+    { label: "WAGMI", emoji: "🚀", kind: "win", tier: "big" }, { label: "REKT", emoji: "💀", kind: "rug" },
+    { label: "MOON", emoji: "🌕", kind: "win", tier: "medium" }, { label: "NGMI", emoji: "📉", kind: "rug" },
+    { label: "GM", emoji: "☀️", kind: "win", tier: "small" }, { label: "RUGGED", emoji: "🫠", kind: "rug" },
+    { label: "PUMP", emoji: "📈", kind: "win", tier: "tiny" }, { label: "DUMP", emoji: "🗑️", kind: "rug" },
   ];
 }
 

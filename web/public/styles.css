@@ -1,5 +1,9 @@
 /* Doompify — DOOMPS "toxic swamp" identity.
    Near-black ground, murky greens, glowing acid-lime accent, slime + tunnel glow. */
+
+/* The HTML [hidden] attribute must always win over component display rules. */
+[hidden] { display: none !important; }
+
 :root {
   --void: #0a0d07;
   --swamp: #10160b;
@@ -50,9 +54,8 @@ body::before {
   filter: drop-shadow(0 0 22px var(--toxic-glow)); }
 .sigil svg { animation: spin 50s linear infinite; }
 .mascot-mark {
-  width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
-  border: 3px solid var(--slime);
-  box-shadow: 0 0 30px var(--toxic-glow), inset 0 0 20px rgba(0,0,0,0.5);
+  width: 200px; height: 200px; border-radius: 18px; object-fit: cover;
+  box-shadow: 0 0 40px var(--toxic-glow), 0 10px 40px rgba(0,0,0,0.6);
   animation: float 4s ease-in-out infinite;
 }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
