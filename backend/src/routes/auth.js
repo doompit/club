@@ -53,6 +53,7 @@ export function authRouter(db) {
           removed: sync.removed.length,
           wallets: sync.walletCount,
           conflicts,
+          roleErrors: (sync.roleErrors || []).length,
         },
         5 * 60 * 1000
       );

@@ -40,7 +40,7 @@ export async function fetchOpenSeaBio(address, apiKey, { fetchImpl = fetch } = {
 
   if (res.status === 404) {
     // Account has never been touched on OpenSea -> no profile / no bio.
-    return { address: addr, bio: "", username: null, exists: false };
+    return { address: addr, bio: "", username: null, exists: false, status: 404 };
   }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
@@ -48,11 +48,20 @@ export async function fetchOpenSeaBio(address, apiKey, { fetchImpl = fetch } = {
   }
 
   const data = await res.json();
+  // OpenSea returns `bio` at the top level; read defensively in case the shape
+  // varies (some responses nest under `account` or use `description`).
+  const bio =
+    data.bio ??
+    data.account?.bio ??
+    data.description ??
+    data.profile?.bio ??
+    "";
   return {
     address: addr,
-    bio: data.bio ?? "",
-    username: data.username ?? null,
+    bio,
+    username: data.username ?? data.account?.username ?? null,
     exists: true,
+    status: res.status,
   };
 }
 

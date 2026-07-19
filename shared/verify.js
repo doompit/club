@@ -18,6 +18,17 @@ export async function proveControl({ address, nonce, keys, contract, opts = {} }
   const account = await fetchOpenSeaBio(address, keys.opensea, opts);
   const controlProven = bioContainsChallenge(account.bio, challenge);
 
+  // Diagnostic logging (shows in server logs) — helps pinpoint why a match
+  // failed without exposing anything sensitive. Turn off with VERIFY_DEBUG=0.
+  if (process.env.VERIFY_DEBUG !== "0") {
+    const preview = (account.bio || "").slice(0, 120).replace(/\s+/g, " ");
+    console.log(
+      `[verify] addr=${address.slice(0, 8)}… status=${account.status ?? "?"} exists=${account.exists} ` +
+      `bioLen=${(account.bio || "").length} matched=${controlProven} ` +
+      `expected="${challenge}" bioPreview="${preview}"`
+    );
+  }
+
   // Optionally check holdings so we can tell the user WHY it failed.
   let holdsCollection = null;
   if (keys.alchemy && contract) {

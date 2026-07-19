@@ -42,23 +42,36 @@ export async function syncUserRoles(db, { discordId, guildId }) {
   const added = [];
   const removed = [];
 
-  // Grant qualifying roles.
+  // Grant qualifying roles. A single role failure (e.g. the bot's role sits
+  // below this role, or a transient Discord error) must NOT fail the whole
+  // verification — the wallet is already linked. Log and continue.
+  const roleErrors = [];
   for (const roleId of targetRoleIds) {
     if (!currentGrants.has(roleId)) {
-      await addRole(discordId, roleId);
-      recordGrant(db, { discordId, guildId, roleId, now });
-      added.push(roleId);
+      try {
+        await addRole(discordId, roleId);
+        recordGrant(db, { discordId, guildId, roleId, now });
+        added.push(roleId);
+      } catch (e) {
+        console.error(`[rolesync] could not add role ${roleId} to ${discordId}: ${e.message}`);
+        roleErrors.push({ roleId, action: "add", message: e.message });
+      }
     }
   }
 
   // Revoke managed roles no longer qualified for.
   for (const roleId of managedRoleIds) {
     if (currentGrants.has(roleId) && !targetRoleIds.has(roleId)) {
-      await removeRole(discordId, roleId);
-      removeGrant(db, { discordId, guildId, roleId });
-      removed.push(roleId);
+      try {
+        await removeRole(discordId, roleId);
+        removeGrant(db, { discordId, guildId, roleId });
+        removed.push(roleId);
+      } catch (e) {
+        console.error(`[rolesync] could not remove role ${roleId} from ${discordId}: ${e.message}`);
+        roleErrors.push({ roleId, action: "remove", message: e.message });
+      }
     }
   }
 
-  return { added, removed, counts, walletCount: wallets.length };
+  return { added, removed, counts, walletCount: wallets.length, roleErrors };
 }
