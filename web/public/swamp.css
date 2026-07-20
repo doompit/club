@@ -201,3 +201,6 @@
   margin-top: 20px; padding: 14px 16px; border: 1px solid var(--slime); border-radius: 10px;
   background: rgba(182,255,46,0.08); color: var(--slime); font-size: 14px;
 }
+
+.ov-practice { color: #ffd479; font-family: "Space Mono", monospace; font-size: 13px; margin-top: 14px; line-height: 1.5; }
+#btnFreeSpin { margin-bottom: 10px; }

@@ -210,3 +210,18 @@ input::placeholder { color: #5c6a45; }
   .sigil svg { animation: none; }
   .btn-primary { transition: none; }
 }
+
+/* Verification troubleshooting expander */
+.troubleshoot {
+  margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px;
+}
+.troubleshoot summary {
+  cursor: pointer; color: var(--slime); font-family: "Space Mono", monospace;
+  font-size: 13px; letter-spacing: 0.02em; list-style: none;
+}
+.troubleshoot summary::-webkit-details-marker { display: none; }
+.troubleshoot summary::before { content: "▸ "; }
+.troubleshoot[open] summary::before { content: "▾ "; }
+.troubleshoot summary:hover { text-decoration: underline; }
+.troubleshoot .walk { margin-top: 12px; }
+.troubleshoot a { color: var(--slime); text-decoration: underline; word-break: break-all; }

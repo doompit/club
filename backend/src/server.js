@@ -7,6 +7,7 @@ import fs from "node:fs";
 import { openDb } from "@doompify/shared/db.js";
 import { config } from "./config.js";
 import { verifyRouter } from "./routes/verify.js";
+import { profileRouter } from "./routes/profile.js";
 import { authRouter } from "./routes/auth.js";
 import { adminRouter } from "./routes/admin.js";
 import { userAuthRouter } from "./routes/userauth.js";
@@ -44,6 +45,7 @@ app.use("/api", verifyRouter(db));
 app.use("/api", memeRouter(db));
 app.use("/api", spinRouter(db));
 app.use("/api", chatRouter(db));
+app.use("/api", profileRouter(db));
 app.use("/auth", authRouter(db));
 app.use("/auth/user", userAuthRouter());
 app.use("/admin/api", adminRouter(db));
@@ -70,6 +72,7 @@ app.use("/admin", express.static(adminDir));
 // /chat -> the chat page; /memematic and /gallery -> the swamp page
 // (its JS reads the #memematic / #gallery hash to scroll to the right section).
 app.get("/chat", (_req, res) => res.sendFile(path.join(webDir, "chat.html")));
+app.get("/profile", (_req, res) => res.sendFile(path.join(webDir, "profile.html")));
 app.get("/memematic", (_req, res) => res.redirect("/swamp.html#memematic"));
 app.get("/gallery", (_req, res) => res.redirect("/swamp.html#gallery"));
 

@@ -9,6 +9,7 @@ const state = {
   file: null,
   poll: null,
   seen: new Set(),
+  replyTo: null,
 };
 
 async function api(path, opts) {
@@ -37,6 +38,18 @@ async function loadChannels() {
   const res = await api("/api/chat/channels");
   if (!res.ok) return;
   state.me = { ...state.me, ...(res.data.me || {}) };
+  // Pull display name + notification preference from the profile.
+  if (state.me.loggedIn) {
+    const p = await api("/api/profile/me");
+    if (p.ok) {
+      state.me.displayName = p.data.displayName || state.me.username;
+      state.me.notifyDisabled = !!p.data.notdisabled;
+    }
+    // Ask for notification permission if they haven't decided and want pings.
+    if (!state.me.notifyDisabled && "Notification" in window && Notification.permission === "default") {
+      try { Notification.requestPermission(); } catch (_) {}
+    }
+  }
   state.channels = res.data.channels || [];
   renderChannels();
   // pick first channel
@@ -105,33 +118,70 @@ async function loadMessages(reset) {
   if (msgs.length) $("msgEmpty").hidden = true;
   const scroll = $("msgScroll");
   const atBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 80;
+  const fresh = [];
   msgs.forEach((m) => {
     if (state.seen.has(m.id)) return;
     state.seen.add(m.id);
     scroll.appendChild(renderMsg(m));
     state.lastId = Math.max(state.lastId, m.id);
+    fresh.push(m);
   });
   if (reset || atBottom) scroll.scrollTop = scroll.scrollHeight;
+  // Notify on new @-mentions (skip the very first load to avoid a burst).
+  if (!reset) maybeNotify(fresh);
 }
 
 function renderMsg(m) {
   const row = document.createElement("div");
   row.className = "msg"; row.dataset.id = m.id;
-  const initial = (m.username || "?")[0].toUpperCase();
+  const name = m.displayName || m.username || "unknown";
+  const initial = (name || "?")[0].toUpperCase();
   const time = new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   const img = m.image ? `<img class="msg-img" src="${m.image}" alt="image" loading="lazy" />` : "";
-  const text = m.body ? `<div class="msg-text">${esc(m.body)}</div>` : "";
+  const text = m.body ? `<div class="msg-text">${highlightMentions(esc(m.body))}</div>` : "";
   const delBtn = (m.mine || state.me.isAdmin) ? `<button class="msg-del" title="Delete">delete</button>` : "";
+  const replyBtn = `<button class="msg-reply" title="Reply">reply</button>`;
+  // avatar: NFT image if set, else colored initial
+  const av = m.avatarUrl
+    ? `<div class="msg-av"><img src="${esc(m.avatarUrl)}" alt="" /></div>`
+    : `<div class="msg-av">${esc(initial)}</div>`;
+  // reply preview (what this message is replying to)
+  const replyPreview = m.replyTo
+    ? `<div class="msg-replyto">↳ <span class="rt-user">${esc(m.replyTo.username || "someone")}</span> ${esc(m.replyTo.snippet || "")}</div>`
+    : "";
+  // does this message tag me?
+  const tagsMe = messageTagsMe(m.body);
+  if (tagsMe) row.classList.add("msg-tagged");
+
   row.innerHTML = `
-    <div class="msg-av">${esc(initial)}</div>
+    ${av}
     <div class="msg-body">
-      <div class="msg-head"><span class="msg-user">${esc(m.username || "unknown")}</span><span class="msg-time">${time}</span></div>
+      ${replyPreview}
+      <div class="msg-head"><span class="msg-user">${esc(name)}</span><span class="msg-time">${time}</span></div>
       ${text}${img}
       <div class="msg-rx"></div>
-    </div>${delBtn}`;
+    </div><div class="msg-actions">${replyBtn}${delBtn}</div>`;
   renderReactions(row.querySelector(".msg-rx"), m);
   if (delBtn) row.querySelector(".msg-del").addEventListener("click", () => deleteMsg(m.id, row));
+  row.querySelector(".msg-reply").addEventListener("click", () => startReply(m));
   return row;
+}
+
+/** Wrap @mentions in a highlight span. */
+function highlightMentions(safeText) {
+  return safeText.replace(/(^|\s)(@everyone|@[\w-]{2,32})/g, (mtch, pre, tag) => {
+    const cls = tag.toLowerCase() === "@everyone" ? "mention mention-all" : "mention";
+    return `${pre}<span class="${cls}">${tag}</span>`;
+  });
+}
+
+/** Does a message body tag the current user (by display name or username)? */
+function messageTagsMe(body) {
+  if (!body || !state.me || !state.me.loggedIn) return false;
+  const lower = body.toLowerCase();
+  if (/(^|\s)@everyone\b/.test(lower)) return true;
+  const names = [state.me.displayName, state.me.username].filter(Boolean).map((s) => "@" + s.toLowerCase());
+  return names.some((n) => lower.includes(n));
 }
 
 function renderReactions(container, m) {
@@ -207,6 +257,8 @@ function wireComposer() {
   });
   $("btnSend").addEventListener("click", send);
   $("msgInput").addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  const rbx = $("replyBarX");
+  if (rbx) rbx.addEventListener("click", clearReply);
 }
 
 async function send() {
@@ -217,11 +269,49 @@ async function send() {
   const form = new FormData();
   form.append("body", text);
   if (state.file) form.append("image", state.file);
+  if (state.replyTo) form.append("replyTo", String(state.replyTo.id));
   const res = await api(`/api/chat/channels/${state.active.id}/messages`, { method: "POST", body: form });
   $("btnSend").disabled = false;
   if (!res.ok) { $("composerLocked").hidden = false; $("composerLocked").textContent = res.data.error || "Couldn't send."; return; }
   $("msgInput").value = ""; state.file = null; $("composerPreview").hidden = true; $("chatFile").value = "";
+  clearReply();
   loadMessages(false);
+}
+
+/* ---------------- replies ---------------- */
+function startReply(m) {
+  state.replyTo = { id: m.id, name: m.displayName || m.username };
+  const bar = $("replyBar");
+  if (bar) {
+    bar.hidden = false;
+    $("replyBarText").textContent = `Replying to ${state.replyTo.name}`;
+  }
+  $("msgInput").focus();
+}
+function clearReply() {
+  state.replyTo = null;
+  const bar = $("replyBar");
+  if (bar) bar.hidden = true;
+}
+
+/* ---------------- browser notifications ---------------- */
+function maybeNotify(newMessages) {
+  // Respect the user's profile preference and browser permission.
+  if (!state.me || !state.me.loggedIn) return;
+  if (state.me.notifyDisabled) return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  if (document.visibilityState === "visible") return; // only when tab not focused
+  for (const m of newMessages) {
+    if (m.mine) continue;
+    if (!messageTagsMe(m.body)) continue;
+    try {
+      const n = new Notification(`${m.displayName || m.username} tagged you in the Swamp`, {
+        body: (m.body || "").slice(0, 120),
+        icon: m.avatarUrl || "/img/doomps-logo.jpeg",
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+    } catch (_) {}
+  }
 }
 
 /* ---------------- polling ---------------- */

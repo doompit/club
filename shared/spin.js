@@ -106,8 +106,22 @@ function indicesWhere(pred) {
  * Full server-side spin resolution. Returns everything the client needs to
  * animate and everything the DB needs to record.
  */
-export function resolveSpin({ prizeLabels } = {}) {
-  const outcome = pickOutcome();
+/**
+ * Resolve a spin. `availableTiers` (optional) is the set/array of winning tiers
+ * that still have an open slot today — pass it to enforce the daily cap of one
+ * winner per tier (4 winners/day). If the random outcome lands on a tier whose
+ * slot is already taken, it becomes a rug (still a game of chance — you only win
+ * if you both roll a winning tier AND its slot is still open).
+ */
+export function resolveSpin({ prizeLabels, availableTiers } = {}) {
+  let outcome = pickOutcome();
+
+  // Daily cap: if this tier's winner slot is already filled, it rugs.
+  if (availableTiers && outcome !== "rug") {
+    const open = availableTiers instanceof Set ? availableTiers : new Set(availableTiers);
+    if (!open.has(outcome)) outcome = "rug";
+  }
+
   const segmentIndex = segmentIndexForOutcome(outcome);
   const segment = WHEEL_SEGMENTS[segmentIndex];
 

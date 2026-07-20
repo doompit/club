@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Profile — The Swamp Club</title>
+<link rel="icon" type="image/jpeg" href="/img/doomps-logo.jpeg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/swamp.css" />
+<link rel="stylesheet" href="/profile.css" />
+</head>
+<body>
+<div class="grain"></div>
+<nav class="topnav">
+  <a class="brand" href="/"><img src="/img/doomps-logo.jpeg" class="brand-logo" alt="DOOMPS" />DOOMPS</a>
+  <div class="navlinks">
+    <a href="https://doomps.xyz">Home</a>
+    <a href="/">Verify</a>
+    <a href="/swamp.html#gallery">Gallery</a>
+    <a href="/swamp.html#memematic">Memematic 3000</a>
+    <a href="/chat.html">The Swamp</a>
+    <a href="/profile.html" class="active">Profile</a>
+    <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <div class="nav-user">
+    <a class="btn-ghost" id="btnLogin" href="/auth/user/login">Log in with Discord</a>
+    <span class="whoami" id="whoami" hidden></span>
+    <button class="btn-ghost" id="btnLogout" hidden>Log out</button>
+  </div>
+</nav>
+
+<main class="profile-wrap">
+  <div id="needLogin" class="panel" hidden>
+    <h1 class="title">Your Swamp profile.</h1>
+    <p class="lede">Log in with Discord to set your name, avatar, and notifications.</p>
+    <a class="btn-primary" href="/auth/user/login">Log in with Discord</a>
+  </div>
+
+  <div id="profileForm" hidden>
+    <header class="profile-head">
+      <div class="profile-av-preview">
+        <img id="avPreview" src="/img/doomps-logo.jpeg" alt="avatar" />
+      </div>
+      <div>
+        <p class="eyebrow">The Swamp Club</p>
+        <h1 class="title" id="headName">Your profile</h1>
+        <p class="lede">Pick a DOOMP as your face, set your name, and how you get pinged.</p>
+      </div>
+    </header>
+
+    <section class="panel">
+      <label class="field-label">Display name</label>
+      <input id="displayName" type="text" maxlength="32" class="caption-input" placeholder="What the swamp calls you" />
+
+      <label class="field-label">Bio</label>
+      <textarea id="bio" maxlength="300" class="caption-input bio-input" placeholder="down bad since mint…"></textarea>
+
+      <label class="field-label toggle-row">
+        <span>Chat ping notifications</span>
+        <input id="notifyToggle" type="checkbox" checked />
+        <span class="toggle-hint" id="notifyHint">On — you'll get browser notifications when tagged</span>
+      </label>
+    </section>
+
+    <section class="panel">
+      <label class="field-label">Choose your avatar — your DOOMPS</label>
+      <p class="hint" id="avatarHint">Loading your DOOMPS…</p>
+      <div class="avatar-grid" id="avatarGrid"></div>
+    </section>
+
+    <div class="save-row">
+      <button id="btnSave" class="btn-primary btn-wide">Save profile</button>
+      <p class="hint" id="saveHint"></p>
+    </div>
+  </div>
+</main>
+
+<script src="/profile.js"></script>
+</body>
+</html>

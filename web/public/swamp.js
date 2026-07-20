@@ -82,28 +82,37 @@ function applyPrizeLabels() {
 
 function updateSpinGate(d) {
   const btn = $("btnSpin");
+  const free = $("btnFreeSpin");
   const status = $("spinStatus");
   status.className = "spin-status";
+
   if (!d.authenticated) {
     btn.disabled = true;
+    if (free) free.disabled = true;
     status.textContent = "Log in with Discord to play.";
     return;
   }
+
+  // Free spin is always available to logged-in users.
+  if (free) free.disabled = false;
+
   if (d.alreadySpun) {
     btn.disabled = true;
     const r = d.todayResult;
     status.textContent = r && r.outcome !== "rug"
-      ? `You already spun today — landed ${r.label}. Back tomorrow (UTC).`
-      : "You already spun today. Back tomorrow (UTC).";
+      ? `You already spun for real today — landed ${r.label}. Back tomorrow (UTC). Free spins still work.`
+      : "You already spun for real today. Back tomorrow (UTC). Free spins still work.";
     return;
   }
   if (!d.hasUploaded) {
     btn.disabled = true;
-    status.textContent = "Upload a meme to unlock today's spin.";
+    btn.textContent = "UPLOAD A MEME TO SPIN FOR PRIZES";
+    status.textContent = "Free spin is open. Upload a meme to unlock the real spin for prizes.";
     return;
   }
   btn.disabled = false;
-  status.textContent = "Ready. One pull. No take-backs.";
+  btn.textContent = "PULL THE LEVER FOR REAL";
+  status.textContent = "Meme dropped — real spin unlocked. One pull, no take-backs.";
   status.classList.add("ok");
 }
 
@@ -113,7 +122,7 @@ function drawWheel() {
   const ctx = canvas.getContext("2d");
   const segs = state.segments.length ? state.segments : fallbackSegs();
   const n = segs.length;
-  const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width / 2 - 8;
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width / 2 - Math.max(16, (canvas.width / 2) * 0.055);
   const arc = (2 * Math.PI) / n;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -124,21 +133,22 @@ function drawWheel() {
     const end = start + arc;
     const mid = start + arc / 2;
 
-    // wedge with a soft radial gradient for depth
+    // wedge with a glossy radial gradient (brighter toward the rim)
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, end);
     ctx.closePath();
     const base = seg.kind === "rug" ? RUG_COLORS[i % 2] : (TIER_COLOR[seg.tier] || "#4e8f16");
-    const grad = ctx.createRadialGradient(cx, cy, r * 0.15, cx, cy, r);
-    grad.addColorStop(0, shade(base, 18));
-    grad.addColorStop(1, shade(base, -12));
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.12, cx, cy, r);
+    grad.addColorStop(0, shade(base, -14));
+    grad.addColorStop(0.72, shade(base, 8));
+    grad.addColorStop(1, shade(base, 24));
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // crisp dark divider between slices
-    ctx.strokeStyle = "rgba(6,10,4,0.85)";
-    ctx.lineWidth = 3;
+    // thin crisp divider between slices
+    ctx.strokeStyle = "rgba(4,7,3,0.9)";
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     // emoji + label drawn HORIZONTALLY (upright, like Wheel of Fortune) at the
@@ -175,22 +185,69 @@ function drawWheel() {
     ctx.restore();
   }
 
-  // hub ring shadow (behind the center logo)
-  ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.20, 0, 2 * Math.PI);
-  ctx.fillStyle = "rgba(6,10,4,0.9)";
-  ctx.fill();
-
-  // bright outer ring
+  // --- glossy top highlight over the slices (subtle sheen) ---
+  const sheen = ctx.createLinearGradient(0, cy - r, 0, cy);
+  sheen.addColorStop(0, "rgba(255,255,255,0.10)");
+  sheen.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-  ctx.strokeStyle = "#b6ff2e";
-  ctx.lineWidth = 5;
-  ctx.stroke();
-  // inner accent ring
+  ctx.clip();
+  ctx.fillStyle = sheen;
+  ctx.fillRect(cx - r, cy - r, r * 2, r);
+  ctx.restore();
+
+  // --- metallic bezel ring ---
+  const R = canvas.width / 2;
+  const bezel = Math.max(16, R * 0.055);
+  const rimGrad = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+  rimGrad.addColorStop(0, "#161d0e");
+  rimGrad.addColorStop(0.25, "#3a4a1c");
+  rimGrad.addColorStop(0.5, "#0c1207");
+  rimGrad.addColorStop(0.75, "#4e6626");
+  rimGrad.addColorStop(1, "#161d0e");
   ctx.beginPath();
-  ctx.arc(cx, cy, r - 3, 0, 2 * Math.PI);
-  ctx.strokeStyle = "rgba(182,255,46,0.25)";
+  ctx.arc(cx, cy, R - bezel / 2, 0, 2 * Math.PI);
+  ctx.strokeStyle = rimGrad;
+  ctx.lineWidth = bezel;
+  ctx.stroke();
+
+  // bright edge lines on the bezel
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 1, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#b6ff2e";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 1.5, 0, 2 * Math.PI);
+  ctx.strokeStyle = "rgba(182,255,46,0.55)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // --- glowing studs around the bezel (one per slice boundary) ---
+  const studR = R - bezel / 2;
+  const studSize = Math.max(2.5, bezel * 0.16);
+  for (let i = 0; i < n; i++) {
+    const a = i * arc - Math.PI / 2;
+    const sx = cx + Math.cos(a) * studR;
+    const sy = cy + Math.sin(a) * studR;
+    ctx.beginPath();
+    ctx.arc(sx, sy, studSize, 0, 2 * Math.PI);
+    ctx.fillStyle = "#eaffb0";
+    ctx.shadowColor = "rgba(182,255,46,0.9)";
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // --- hub backing (behind the center logo) ---
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.19, 0, 2 * Math.PI);
+  ctx.fillStyle = "rgba(6,10,4,0.92)";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.19, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#b6ff2e";
   ctx.lineWidth = 2;
   ctx.stroke();
 }
@@ -225,20 +282,26 @@ function wireUpload() {
   });
   input.addEventListener("change", () => { if (input.files[0]) selectFile(input.files[0]); });
   $("btnUpload").addEventListener("click", doUpload);
+  $("btnClearUpload").addEventListener("click", () => {
+    resetUploader();
+    $("uploadHint").textContent = "";
+    $("uploadHint").className = "hint";
+  });
 }
 
 function selectFile(file) {
   const ok = ["image/png", "image/jpeg", "image/gif", "image/webp"];
   const hint = $("uploadHint");
   hint.className = "hint";
-  if (!ok.includes(file.type)) { hint.className = "hint err"; hint.textContent = "Unsupported file type."; return; }
-  if (file.size > 8 * 1024 * 1024) { hint.className = "hint err"; hint.textContent = "Too big (max 8 MB)."; return; }
+  if (!ok.includes(file.type)) { hint.className = "hint err"; hint.textContent = "That file type isn't supported — use PNG, JPG, GIF, or WEBP."; return; }
+  if (file.size > 8 * 1024 * 1024) { hint.className = "hint err"; hint.textContent = "That image is too big (max 8 MB). Pick a smaller one."; return; }
   state.selectedFile = file;
   const preview = $("dzPreview");
   preview.src = URL.createObjectURL(file);
   preview.hidden = false;
   $("dzInner").hidden = true;
   $("btnUpload").disabled = false;
+  $("btnClearUpload").hidden = false; // allow choosing a different image anytime
   hint.textContent = "";
 }
 
@@ -246,7 +309,11 @@ async function doUpload() {
   if (!state.selectedFile) return;
   const hint = $("uploadHint");
   hint.className = "hint";
-  if (!state.user) { hint.className = "hint err"; hint.textContent = "Log in with Discord first."; return; }
+  if (!state.user) {
+    hint.className = "hint err";
+    hint.innerHTML = 'You need to log in first. <a href="/auth/user/login">Log in with Discord</a>';
+    return;
+  }
 
   $("btnUpload").disabled = true;
   hint.textContent = "Uploading to the swamp…";
@@ -254,25 +321,46 @@ async function doUpload() {
   form.append("image", state.selectedFile);
   form.append("caption", $("caption").value || "");
 
-  const res = await api("/api/memes", { method: "POST", body: form });
+  let res;
+  try {
+    res = await api("/api/memes", { method: "POST", body: form });
+  } catch (e) {
+    res = { ok: false, data: { error: "Network error — check your connection and try again." } };
+  }
+
   if (!res.ok) {
     hint.className = "hint err";
-    hint.textContent = res.data.error || "Upload failed.";
+    // route the common cases to the right action
+    if (res.data.needLogin) {
+      hint.innerHTML = 'Your session expired. <a href="/auth/user/login">Log in again</a> to upload.';
+    } else if (res.data.needVerify) {
+      hint.innerHTML = (res.data.error || "You need to verify a DOOMPS wallet first.") + ' <a href="/">Verify now</a>';
+    } else {
+      hint.textContent = res.data.error || "Upload failed. Try a different image.";
+    }
     $("btnUpload").disabled = false;
+    $("btnClearUpload").hidden = false; // let them clear and pick another
     return;
   }
   hint.className = "hint ok";
   hint.textContent = "Dropped. Your spin is unlocked.";
-  // reset uploader
-  state.selectedFile = null;
-  $("dzPreview").hidden = true;
-  $("dzInner").hidden = false;
-  $("caption").value = "";
+  resetUploader();
   // refresh gallery + spin gate
   state.galleryOffset = 0; state.galleryDone = false;
   await loadGallery(true);
   const s = await api("/api/spin/state");
   if (s.ok) updateSpinGate(s.data);
+}
+
+/** Clear the selected file so the user can choose a different one. */
+function resetUploader() {
+  state.selectedFile = null;
+  $("dzPreview").hidden = true;
+  $("dzInner").hidden = false;
+  $("caption").value = "";
+  $("fileInput").value = "";
+  $("btnUpload").disabled = true;
+  $("btnClearUpload").hidden = true;
 }
 
 /* ---------------- gallery ---------------- */
@@ -307,6 +395,27 @@ $("btnMore").addEventListener("click", () => loadGallery(false));
 /* ---------------- spin ---------------- */
 function wireSpin() {
   $("btnSpin").addEventListener("click", doSpin);
+  const free = $("btnFreeSpin");
+  if (free) free.addEventListener("click", doFreeSpin);
+}
+
+async function doFreeSpin() {
+  if (state.spinning) return;
+  state.spinning = true;
+  $("btnFreeSpin").disabled = true;
+  $("btnSpin").disabled = true;
+  $("spinStatus").className = "spin-status";
+  $("spinStatus").textContent = "Free spin — just for fun…";
+
+  const res = await api("/api/spin/practice", { method: "POST" });
+  if (!res.ok) {
+    state.spinning = false;
+    $("btnFreeSpin").disabled = false;
+    $("spinStatus").className = "spin-status err";
+    $("spinStatus").textContent = res.data.error || "Couldn't spin.";
+    return;
+  }
+  animateTo(res.data.segmentIndex, () => showResult({ ...res.data, practice: true }));
 }
 
 async function doSpin() {
@@ -357,17 +466,34 @@ function showResult(data) {
     carpet.classList.remove("pull"); monster.classList.remove("fall");
     void carpet.offsetWidth; // reflow to restart animation
     carpet.classList.add("pull"); monster.classList.add("fall");
+    // If this was a free spin, make clear nothing was lost.
+    const rugSub = document.getElementById("ovRugSub");
+    if (rugSub) rugSub.textContent = data.practice
+      ? "Just a free spin — no harm done. Upload a meme and spin for real."
+      : "";
   } else {
     $("ovWin").hidden = false;
     $("ovWinTitle").textContent = data.segmentLabel || "WAGMI";
-    $("ovWinSub").textContent = `You won the ${data.outcome} prize`;
-    $("ovPrize").textContent = data.prize || "";
-    // reset claim form for this win
-    $("claimBox").hidden = false;
-    $("claimDone").hidden = true;
-    $("claimAddr").value = "";
-    $("claimHint").textContent = "";
-    $("btnClaim").disabled = false;
+    if (data.practice) {
+      // Practice win: show what they WOULD have gotten, no claim.
+      $("ovWinSub").textContent = `Free spin — you'd have won the ${data.outcome} prize`;
+      $("ovPrize").textContent = data.prize || "";
+      $("claimBox").hidden = true;
+      $("claimDone").hidden = true;
+      const note = document.getElementById("ovPracticeNote");
+      if (note) { note.hidden = false; note.textContent = "This was a free spin — nothing paid out. Upload a meme, then pull the real lever to win for real."; }
+    } else {
+      $("ovWinSub").textContent = `You won the ${data.outcome} prize`;
+      $("ovPrize").textContent = data.prize || "";
+      const note = document.getElementById("ovPracticeNote");
+      if (note) note.hidden = true;
+      // reset claim form for this win
+      $("claimBox").hidden = false;
+      $("claimDone").hidden = true;
+      $("claimAddr").value = "";
+      $("claimHint").textContent = "";
+      $("btnClaim").disabled = false;
+    }
   }
   state.spinning = false;
 }

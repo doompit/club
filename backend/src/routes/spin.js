@@ -6,6 +6,7 @@ import {
   resolveSpin,
   dayKeyUTC,
   WHEEL_SEGMENTS,
+  WINNING_TIERS,
 } from "@doompify/shared";
 import {
   getPrizeConfig,
@@ -13,6 +14,7 @@ import {
   recordSpin,
   userHasUploaded,
   setPayoutAddress,
+  winnersByTierToday,
 } from "@doompify/shared/db.js";
 import { normalizeAddress } from "@doompify/shared";
 
@@ -46,7 +48,28 @@ export function spinRouter(db) {
   });
 
   /**
-   * POST /api/spin — perform today's spin. Holder + uploaded + not-yet-spun.
+   * POST /api/spin/practice — a FREE practice spin. Anyone logged in can do this
+   * as often as they like. It returns a random wheel result for show only — it
+   * does NOT record a spin, does NOT pay out, and never consumes a daily winner
+   * slot. Purely "here's what you might have gotten."
+   */
+  router.post("/spin/practice", requireUser, (req, res) => {
+    const prizes = getPrizeConfig(db);
+    // Full odds, no daily-cap awareness — it's just a demo of the wheel.
+    const result = resolveSpin({ prizeLabels: prizes });
+    res.json({
+      ok: true,
+      practice: true,
+      outcome: result.outcome,
+      isWin: result.isWin,
+      segmentIndex: result.segmentIndex,
+      segmentLabel: result.segmentLabel,
+      prize: result.isWin ? result.prize : null,
+    });
+  });
+
+  /**
+   * POST /api/spin — perform today's REAL spin. Holder + uploaded + not-yet-spun.
    */
   router.post("/spin", requireUser, async (req, res) => {
     const discordId = req.user.id;
@@ -75,8 +98,12 @@ export function spinRouter(db) {
 
     // Resolve server-side (authoritative), then persist. The unique constraint
     // on (discord_id, day_key) is the final guard against double-spin races.
+    // Enforce the daily cap: at most one winner per tier (4 winners/day). A tier
+    // whose slot is already filled today can't be won again — it rugs instead.
     const prizes = getPrizeConfig(db);
-    const result = resolveSpin({ prizeLabels: prizes });
+    const taken = winnersByTierToday(db, { dayKey });
+    const availableTiers = WINNING_TIERS.filter((t) => (taken[t] || 0) < 1);
+    const result = resolveSpin({ prizeLabels: prizes, availableTiers });
     const rec = recordSpin(db, {
       discordId,
       dayKey,

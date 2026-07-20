@@ -21,6 +21,7 @@
     <a href="/swamp.html#gallery" class="active">Gallery</a>
     <a href="/swamp.html#memematic" class="active">Memematic 3000</a>
     <a href="/chat.html">The Swamp</a>
+    <a href="/profile.html">Profile</a>
     <a href="https://discord.gg/fm3A7Wn8Fh" target="_blank" rel="noopener">Discord</a>
   </div>
   <div class="nav-user" id="navUser">
@@ -63,7 +64,8 @@
             <li><span class="dot rug"></span><span class="ol-name">Rugged</span><span class="ol-pct">50%</span></li>
           </ul>
         </div>
-        <button id="btnSpin" class="btn-primary btn-lever">PULL THE LEVER</button>
+        <button id="btnFreeSpin" class="btn-ghost btn-lever">FREE SPIN — see what you'd get</button>
+        <button id="btnSpin" class="btn-primary btn-lever">PULL THE LEVER FOR REAL</button>
         <p class="spin-status" id="spinStatus"></p>
       </div>
     </div>
@@ -84,6 +86,7 @@
     </div>
     <input id="caption" type="text" maxlength="280" placeholder="Caption (optional)" class="caption-input" />
     <button id="btnUpload" class="btn-primary btn-wide" disabled>UPLOAD TO THE SWAMP</button>
+    <button id="btnClearUpload" class="btn-ghost btn-wide" hidden>Clear &amp; choose a different image</button>
     <p class="hint" id="uploadHint"></p>
   </section>
 
@@ -118,6 +121,7 @@
         <p class="hint" id="claimHint"></p>
       </div>
       <div class="claim-done" id="claimDone" hidden>Prize claim locked in. The swamp keepers will send it to your wallet.</div>
+      <p class="ov-practice" id="ovPracticeNote" hidden></p>
     </div>
     <div id="ovRug" hidden>
       <div class="rug-scene">

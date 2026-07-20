@@ -119,6 +119,7 @@ export function openDb(path) {
       username    TEXT,
       body        TEXT,                -- text (may be empty if image-only)
       image       TEXT,                -- uploaded filename, nullable
+      reply_to    INTEGER,             -- message id this replies to, nullable
       created_at  INTEGER NOT NULL,
       deleted     INTEGER NOT NULL DEFAULT 0
     );
@@ -142,6 +143,7 @@ export function openDb(path) {
       bio            TEXT,
       avatar_url     TEXT,          -- image URL of the chosen NFT
       avatar_token   TEXT,          -- token id of the chosen NFT
+      notify_disabled INTEGER NOT NULL DEFAULT 0,  -- 1 = chat pings muted
       updated_at     INTEGER NOT NULL
     );
   `);
@@ -166,6 +168,18 @@ function migrateColumns(db) {
     if (!cols.has(name)) {
       db.exec(`ALTER TABLE spins ADD COLUMN ${name} ${type}`);
     }
+  }
+
+  // profiles: added notify_disabled after initial release.
+  const pcols = new Set(db.prepare(`PRAGMA table_info(profiles)`).all().map((c) => c.name));
+  if (pcols.size && !pcols.has("notify_disabled")) {
+    db.exec(`ALTER TABLE profiles ADD COLUMN notify_disabled INTEGER NOT NULL DEFAULT 0`);
+  }
+
+  // messages: added reply_to after initial release.
+  const mcols = new Set(db.prepare(`PRAGMA table_info(messages)`).all().map((c) => c.name));
+  if (mcols.size && !mcols.has("reply_to")) {
+    db.exec(`ALTER TABLE messages ADD COLUMN reply_to INTEGER`);
   }
 }
 
@@ -250,6 +264,21 @@ export function getSpinForDay(db, { discordId, dayKey }) {
   return db.prepare(
     `SELECT * FROM spins WHERE discord_id = ? AND day_key = ?`
   ).get(discordId, dayKey);
+}
+
+/**
+ * How many winners of each tier have already been awarded today.
+ * Returns e.g. { big: 1, medium: 0, small: 1, tiny: 0 }.
+ * Used to enforce the daily cap of one winner per tier (4 winners/day total).
+ */
+export function winnersByTierToday(db, { dayKey }) {
+  const rows = db.prepare(
+    `SELECT outcome, COUNT(*) AS n FROM spins
+     WHERE day_key = ? AND outcome != 'rug' GROUP BY outcome`
+  ).all(dayKey);
+  const out = { big: 0, medium: 0, small: 0, tiny: 0 };
+  for (const r of rows) if (r.outcome in out) out[r.outcome] = r.n;
+  return out;
 }
 
 export function recordSpin(db, { discordId, dayKey, outcome, label, prizeLabel, username, now }) {
@@ -481,11 +510,11 @@ function parseChannel(row) {
 function safeJSON(s) { try { return JSON.parse(s); } catch { return []; } }
 
 /* ---- messages ---- */
-export function addMessage(db, { channelId, discordId, username, body, image, now }) {
+export function addMessage(db, { channelId, discordId, username, body, image, replyTo, now }) {
   return db.prepare(`
-    INSERT INTO messages (channel_id, discord_id, username, body, image, created_at)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(channelId, discordId, username ?? null, body ?? null, image ?? null, now).lastInsertRowid;
+    INSERT INTO messages (channel_id, discord_id, username, body, image, reply_to, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(channelId, discordId, username ?? null, body ?? null, image ?? null, replyTo ?? null, now).lastInsertRowid;
 }
 
 /**
@@ -588,23 +617,26 @@ export function getProfile(db, discordId) {
  * Create or update a member's profile. Only provided fields are changed.
  * avatar_url + avatar_token are set together (the chosen NFT).
  */
-export function upsertProfile(db, { discordId, displayName, bio, avatarUrl, avatarToken, now }) {
+export function upsertProfile(db, { discordId, displayName, bio, avatarUrl, avatarToken, notifyDisabled, now }) {
   const existing = getProfile(db, discordId);
   const next = {
     display_name: displayName !== undefined ? displayName : existing?.display_name ?? null,
     bio: bio !== undefined ? bio : existing?.bio ?? null,
     avatar_url: avatarUrl !== undefined ? avatarUrl : existing?.avatar_url ?? null,
     avatar_token: avatarToken !== undefined ? avatarToken : existing?.avatar_token ?? null,
+    notify_disabled:
+      notifyDisabled !== undefined ? (notifyDisabled ? 1 : 0) : existing?.notify_disabled ?? 0,
   };
   db.prepare(`
-    INSERT INTO profiles (discord_id, display_name, bio, avatar_url, avatar_token, updated_at)
-    VALUES (@discord_id, @display_name, @bio, @avatar_url, @avatar_token, @updated_at)
+    INSERT INTO profiles (discord_id, display_name, bio, avatar_url, avatar_token, notify_disabled, updated_at)
+    VALUES (@discord_id, @display_name, @bio, @avatar_url, @avatar_token, @notify_disabled, @updated_at)
     ON CONFLICT(discord_id) DO UPDATE SET
-      display_name = @display_name,
-      bio          = @bio,
-      avatar_url   = @avatar_url,
-      avatar_token = @avatar_token,
-      updated_at   = @updated_at
+      display_name    = @display_name,
+      bio             = @bio,
+      avatar_url      = @avatar_url,
+      avatar_token    = @avatar_token,
+      notify_disabled = @notify_disabled,
+      updated_at      = @updated_at
   `).run({ discord_id: discordId, ...next, updated_at: now });
   return getProfile(db, discordId);
 }

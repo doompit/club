@@ -112,3 +112,30 @@
   position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%;
   background: var(--bad); color: #fff; border: none; cursor: pointer; font-size: 12px;
 }
+
+/* ---- avatars, mentions, replies (profile-driven) ---- */
+.msg-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.msg-av { overflow: hidden; }
+.mention {
+  color: #b6ff2e; background: rgba(182,255,46,0.12);
+  padding: 0 4px; border-radius: 4px; font-weight: 700;
+}
+.mention-all { color: #ffd479; background: rgba(255,212,121,0.14); }
+.msg-tagged { background: rgba(182,255,46,0.06); border-left: 2px solid var(--slime); }
+.msg-replyto {
+  font-size: 12px; color: var(--muted); margin-bottom: 3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 460px;
+}
+.msg-replyto .rt-user { color: var(--slime); font-weight: 600; }
+.msg-actions { display: flex; gap: 8px; align-items: flex-start; }
+.msg-reply, .msg-del {
+  background: none; border: none; color: var(--muted); font-size: 11px;
+  cursor: pointer; font-family: "Space Mono", monospace; opacity: 0; transition: opacity 0.15s;
+}
+.msg:hover .msg-reply, .msg:hover .msg-del { opacity: 0.7; }
+.msg-reply:hover, .msg-del:hover { opacity: 1; color: var(--slime); }
+.reply-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(182,255,46,0.08); border-left: 2px solid var(--slime);
+  padding: 6px 12px; font-size: 13px; color: var(--slime); border-radius: 6px 6px 0 0;
+}

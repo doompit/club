@@ -35,6 +35,15 @@
       if (json.added) parts.push(`${json.added} role(s) granted`);
       if (json.conflicts && json.conflicts.length) parts.push(`${json.conflicts.length} already claimed by others`);
       document.getElementById("msg").textContent = parts.join(" · ") + ".";
+      // If roles couldn't be applied, reassure them they ARE verified.
+      if (json.roleErrors && json.roleErrors > 0) {
+        const note = document.createElement("p");
+        note.className = "lede";
+        note.style.marginTop = "12px";
+        note.style.color = "#ffd479";
+        note.textContent = "You're verified and your wallet is linked. Your Discord role will appear shortly — make sure you've joined the DOOMPS Discord server. If it doesn't show up, an admin can re-sync it.";
+        document.getElementById("msg").insertAdjacentElement("afterend", note);
+      }
     }
   } catch (_) {}
 </script>

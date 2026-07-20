@@ -22,6 +22,7 @@ import {
   reactionsFor,
   userReactionsFor,
   seedDefaultChannels,
+  profilesFor,
 } from "@doompify/shared/db.js";
 
 const ALLOWED = { "image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp" };
@@ -76,18 +77,42 @@ export function chatRouter(db) {
     const rx = reactionsFor(db, ids);
     const mine = ctx.loggedIn ? userReactionsFor(db, { messageIds: ids, discordId: ctx.user.id }) : {};
 
+    // Profiles for avatar + display name (senders and reply targets).
+    const profiles = profilesFor(db, rows.map((m) => m.discord_id));
+    // Build a quick lookup of replied-to messages for previews.
+    const replyIds = rows.map((m) => m.reply_to).filter(Boolean);
+    const replyMap = {};
+    for (const rid of replyIds) {
+      if (replyMap[rid]) continue;
+      const rm = getMessage(db, rid);
+      if (rm) {
+        const rp = profilesFor(db, [rm.discord_id])[rm.discord_id];
+        replyMap[rid] = {
+          id: rm.id,
+          username: (rp && rp.displayName) || rm.username,
+          snippet: (rm.body || (rm.image ? "📷 image" : "")).slice(0, 80),
+        };
+      }
+    }
+
     res.json({
-      messages: rows.map((m) => ({
-        id: m.id,
-        username: m.username,
-        discordId: m.discord_id,
-        body: m.body,
-        image: m.image ? `/uploads/chat/${m.image}` : null,
-        createdAt: m.created_at,
-        mine: ctx.loggedIn && m.discord_id === ctx.user.id,
-        reactions: rx[m.id] || {},
-        myReactions: mine[m.id] || [],
-      })),
+      messages: rows.map((m) => {
+        const prof = profiles[m.discord_id] || {};
+        return {
+          id: m.id,
+          username: m.username,
+          displayName: prof.displayName || m.username,
+          avatarUrl: prof.avatarUrl || null,
+          discordId: m.discord_id,
+          body: m.body,
+          image: m.image ? `/uploads/chat/${m.image}` : null,
+          createdAt: m.created_at,
+          mine: ctx.loggedIn && m.discord_id === ctx.user.id,
+          reactions: rx[m.id] || {},
+          myReactions: mine[m.id] || [],
+          replyTo: m.reply_to ? replyMap[m.reply_to] || null : null,
+        };
+      }),
     });
   });
 
@@ -111,12 +136,27 @@ export function chatRouter(db) {
       const image = req.file ? req.file.filename : null;
       if (!body && !image) return res.status(400).json({ error: "Empty message." });
 
+      // @everyone is admin-only. Strip it from non-admins so it doesn't ping.
+      let finalBody = body;
+      const hasEveryone = /(^|\s)@everyone\b/i.test(body);
+      if (hasEveryone && !ctx.isAdmin) {
+        finalBody = body.replace(/(^|\s)@everyone\b/gi, "$1everyone");
+      }
+
+      // Validate reply target (must be a real message in this channel).
+      let replyTo = parseInt(req.body.replyTo, 10) || null;
+      if (replyTo) {
+        const target = getMessage(db, replyTo);
+        if (!target || target.channel_id !== channel.id || target.deleted) replyTo = null;
+      }
+
       const id = addMessage(db, {
         channelId: channel.id,
         discordId: ctx.user.id,
         username: ctx.user.username,
-        body: body || null,
+        body: finalBody || null,
         image,
+        replyTo,
         now: Date.now(),
       });
       res.json({ ok: true, id });
